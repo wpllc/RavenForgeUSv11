@@ -1,0 +1,483 @@
+/* ==========================================================================
+   RavenForge Tactical Design System (Military-Aerospace HUD)
+   ========================================================================== */
+
+:root {
+  /* HSL Color System */
+  --bg-primary: hsl(220, 24%, 6%);       /* Stealth Black Carbon Matrix */
+  --bg-secondary: hsl(220, 20%, 10%);   /* Console Panel Base */
+  --bg-tertiary: hsl(220, 18%, 15%);    /* Control Module Background */
+  
+  --color-cyan: hsl(182, 100%, 48%);     /* Telemetry Green-Cyan (Active) */
+  --color-cyan-glow: hsla(182, 100%, 48%, 0.3);
+  
+  --color-amber: hsl(38, 100%, 52%);     /* Propulsion / Advisory Mach Amber */
+  --color-amber-glow: hsla(38, 100%, 52%, 0.3);
+  
+  --color-red: hsl(355, 100%, 55%);      /* Threat Alert / Thermal Max Red */
+  --color-red-glow: hsla(355, 100%, 55%, 0.35);
+  
+  --color-green: hsl(110, 100%, 50%);    /* System Safe / Lock Established Green */
+  --color-green-glow: hsla(110, 100%, 50%, 0.25);
+
+  --color-text-main: hsl(180, 25%, 92%); /* High Contrast HUD Digital White */
+  --color-text-dim: hsl(180, 12%, 70%);  /* Readout Telemetry Data Grey */
+  --color-text-dark: hsl(220, 12%, 40%); /* Grid Coordinates Reference Grey */
+
+  /* Borders & Shadows */
+  --border-cyan: 1px solid hsla(182, 100%, 48%, 0.25);
+  --border-amber: 1px solid hsla(38, 100%, 52%, 0.25);
+  --border-red: 1px solid hsla(355, 100%, 55%, 0.25);
+  --border-dim: 1px solid hsla(180, 12%, 70%, 0.1);
+  
+  --glow-cyan: 0 0 12px hsla(182, 100%, 48%, 0.25);
+  --glow-amber: 0 0 12px hsla(38, 100%, 52%, 0.25);
+  --glow-red: 0 0 15px hsla(355, 100%, 55%, 0.3);
+
+  /* Fonts */
+  --font-hud: 'Orbitron', 'Rajdhani', -apple-system, sans-serif;
+  --font-mono: 'Share Tech Mono', 'JetBrains Mono', monospace;
+}
+
+/* Base Configuration */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--bg-primary);
+  color: var(--color-text-main);
+  font-family: var(--font-hud);
+  font-size: 16px;
+  overflow-x: hidden;
+  height: 100%;
+  letter-spacing: 0.05em;
+  image-rendering: pixelated;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Custom Sci-fi Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+  border-left: var(--border-dim);
+}
+::-webkit-scrollbar-thumb {
+  background: hsla(182, 100%, 48%, 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-cyan);
+  box-shadow: var(--glow-cyan);
+}
+
+/* ==========================================================================
+   Advanced Overlay FX (CRT & Cybernetics)
+   ========================================================================== */
+
+/* Cybernetic Grid & Carbon Mesh Backing */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  background-image: 
+    linear-gradient(rgba(18, 24, 32, 0.95), rgba(18, 24, 32, 0.95)),
+    radial-gradient(circle at 50% 50%, rgba(20, 32, 45, 0.4) 0%, rgba(10, 14, 20, 0.95) 100%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.15) 0px, rgba(0, 0, 0, 0.15) 1px, transparent 1px, transparent 2px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.15) 0px, rgba(0, 0, 0, 0.15) 1px, transparent 1px, transparent 2px);
+  background-size: 100% 100%, 100% 100%, 4px 4px, 4px 4px;
+}
+
+/* Screen Scanline Scan Overlay */
+.hud-scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg, 
+    rgba(255, 0, 0, 0.04), 
+    rgba(0, 255, 0, 0.01), 
+    rgba(0, 0, 255, 0.04)
+  );
+  background-size: 100% 4px, 6px 100%;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* CRT Flicker & Digital Glitch Animations */
+@keyframes crt-flicker {
+  0% { opacity: 0.99; }
+  50% { opacity: 0.96; }
+  100% { opacity: 0.99; }
+}
+
+@keyframes scanline-scroll {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.hud-crt-screen {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  animation: crt-flicker 0.15s infinite;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.hud-crt-screen::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 243, 255, 0.05) 10%,
+    transparent 20%
+  );
+  animation: scanline-scroll 8s linear infinite;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   UI Utility Framework & Layouts
+   ========================================================================== */
+
+/* Glitch Tech Font Effects */
+.tech-font {
+  font-family: var(--font-mono);
+  letter-spacing: 0.1em;
+}
+
+/* High-Tech Glowing Borders */
+.hud-panel {
+  background: var(--bg-secondary);
+  border: var(--border-dim);
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.hud-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--color-cyan);
+  box-shadow: var(--glow-cyan);
+  opacity: 0.4;
+}
+
+.hud-panel.accent-amber::before {
+  background: var(--color-amber);
+  box-shadow: var(--glow-amber);
+}
+
+.hud-panel.accent-red::before {
+  background: var(--color-red);
+  box-shadow: var(--glow-red);
+}
+
+/* Tactical Corner Brackets */
+.corners::before, .corners::after,
+.corners-inner::before, .corners-inner::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-color: var(--color-cyan);
+  border-style: solid;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.corners::before {
+  top: 0;
+  left: 0;
+  border-width: 2px 0 0 2px;
+}
+.corners::after {
+  top: 0;
+  right: 0;
+  border-width: 2px 2px 0 0;
+}
+.corners-inner::before {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 2px 2px;
+}
+.corners-inner::after {
+  bottom: 0;
+  right: 0;
+  border-width: 0 2px 2px 0;
+}
+
+/* Corner variations for amber/red theme panels */
+.accent-amber .corners::before, .accent-amber .corners::after,
+.accent-amber .corners-inner::before, .accent-amber .corners-inner::after {
+  border-color: var(--color-amber);
+}
+.accent-red .corners::before, .accent-red .corners::after,
+.accent-red .corners-inner::before, .accent-red .corners-inner::after {
+  border-color: var(--color-red);
+}
+
+/* Interactive Radar Grid Matrix (Background Decoration) */
+.hud-grid-matrix {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  background-image: 
+    linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+}
+
+/* Dynamic Glitch Text */
+.glitch-text {
+  position: relative;
+  text-shadow: 0.05em 0 0 rgba(255,0,0,.75), -0.025em -0.05em 0 rgba(0,255,0,.75), 0.025em 0.05em 0 rgba(0,0,255,.75);
+  animation: glitch 1.5s infinite;
+}
+
+@keyframes glitch {
+  0% {
+    text-shadow: 1px 0 0 rgba(255,0,0,.5), -1px -1px 0 rgba(0,255,0,.3), 0 1px 0 rgba(0,0,255,.5);
+  }
+  20% {
+    text-shadow: -1px 0 0 rgba(255,0,0,.5), 1px 1px 0 rgba(0,255,0,.3), -1px -1px 0 rgba(0,0,255,.5);
+  }
+  40% {
+    text-shadow: 0.5px 0.5px 0 rgba(255,0,0,.5), -0.5px -0.5px 0 rgba(0,255,0,.3), 0.5px -0.5px 0 rgba(0,0,255,.5);
+  }
+  60% {
+    text-shadow: 1px 0.5px 0 rgba(255,0,0,.5), -1px 1px 0 rgba(0,255,0,.3), -1px -0.5px 0 rgba(0,0,255,.5);
+  }
+  80% {
+    text-shadow: -1px -1px 0 rgba(255,0,0,.5), 1px -1px 0 rgba(0,255,0,.3), 1px 1px 0 rgba(0,0,255,.5);
+  }
+  100% {
+    text-shadow: 1px 0 0 rgba(255,0,0,.5), -1px -1px 0 rgba(0,255,0,.3), 0 1px 0 rgba(0,0,255,.5);
+  }
+}
+
+/* Buttons and Tactical Controls */
+.hud-btn {
+  background: rgba(0, 243, 255, 0.05);
+  border: var(--border-cyan);
+  color: var(--color-cyan);
+  padding: 10px 18px;
+  font-family: var(--font-hud);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+
+.hud-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.15), transparent);
+  transition: all 0.4s ease;
+}
+
+.hud-btn:hover {
+  background: rgba(0, 243, 255, 0.15);
+  box-shadow: var(--glow-cyan);
+  color: #fff;
+  border-color: var(--color-cyan);
+}
+
+.hud-btn:hover::after {
+  left: 100%;
+}
+
+.hud-btn.btn-amber {
+  border-color: var(--color-amber);
+  color: var(--color-amber);
+  background: rgba(255, 159, 0, 0.03);
+}
+.hud-btn.btn-amber:hover {
+  background: rgba(255, 159, 0, 0.15);
+  box-shadow: var(--glow-amber);
+  color: #fff;
+  border-color: var(--color-amber);
+}
+
+.hud-btn.btn-red {
+  border-color: var(--color-red);
+  color: var(--color-red);
+  background: rgba(255, 59, 48, 0.03);
+}
+.hud-btn.btn-red:hover {
+  background: rgba(255, 59, 48, 0.15);
+  box-shadow: var(--glow-red);
+  color: #fff;
+  border-color: var(--color-red);
+}
+
+/* High tech badges/statuses */
+.tactical-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 2px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  background: rgba(0, 243, 255, 0.1);
+  border: var(--border-cyan);
+  color: var(--color-cyan);
+}
+
+.tactical-badge.badge-amber {
+  background: rgba(255, 159, 0, 0.1);
+  border: var(--border-amber);
+  color: var(--color-amber);
+}
+
+.tactical-badge.badge-red {
+  background: rgba(255, 59, 48, 0.1);
+  border: var(--border-red);
+  color: var(--color-red);
+}
+
+.tactical-badge.badge-green {
+  background: rgba(100, 255, 100, 0.1);
+  border: 1px solid var(--color-green);
+  color: var(--color-green);
+}
+
+/* Digital telemetric indicator dots */
+.pulse-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-cyan);
+  box-shadow: var(--glow-cyan);
+  display: inline-block;
+  position: relative;
+}
+
+.pulse-indicator::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid var(--color-cyan);
+  animation: pulse-ring 1.5s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
+  opacity: 0.8;
+}
+
+.pulse-indicator.indicator-amber {
+  background: var(--color-amber);
+  box-shadow: var(--glow-amber);
+}
+.pulse-indicator.indicator-amber::after {
+  border-color: var(--color-amber);
+}
+
+.pulse-indicator.indicator-red {
+  background: var(--color-red);
+  box-shadow: var(--glow-red);
+}
+.pulse-indicator.indicator-red::after {
+  border-color: var(--color-red);
+}
+
+.pulse-indicator.indicator-green {
+  background: var(--color-green);
+  box-shadow: var(--glow-green-glow);
+}
+.pulse-indicator.indicator-green::after {
+  border-color: var(--color-green);
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.5); opacity: 1; }
+  80%, 100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Custom CSS layout helpers */
+.tech-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+}
+
+.tech-table th {
+  background: rgba(0, 243, 255, 0.05);
+  border-bottom: 2px solid hsla(182, 100%, 48%, 0.3);
+  color: var(--color-cyan);
+  padding: 10px;
+  text-align: left;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+.tech-table td {
+  padding: 10px;
+  border-bottom: var(--border-dim);
+  font-size: 0.85rem;
+  color: var(--color-text-dim);
+}
+
+.tech-table tr:hover td {
+  background: rgba(0, 243, 255, 0.02);
+  color: #fff;
+}
+
+/* Responsive UI Helpers */
+.hud-desktop-only {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hud-desktop-only {
+    display: block;
+  }
+}
+
