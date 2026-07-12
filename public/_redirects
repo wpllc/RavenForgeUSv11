@@ -1,1 +1,2 @@
-# SPA fallback is handled automatically by wrangler.json assets configuration.
+# SPA fallback rule for Cloudflare Pages routing
+/* /index.html 200
