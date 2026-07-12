@@ -65,10 +65,10 @@ export default function ReviewQueue() {
         <div>
           <h1 className="text-xl font-bold text-white flex items-center gap-2">
             <UserCheck size={20} className="text-[#38bdf8]" />
-            Human Review Queue
+            Governance Inspector
           </h1>
           <p className="text-xs text-[#94a3b8]">
-            Items flagged with low confidence index score, requiring manual review and verification.
+            Human Review Queue - Items flagged with low confidence score requiring manual operator verification.
           </p>
         </div>
         <div className="bg-[#131c2e] border border-[#334155] rounded-md px-3 py-1 text-xs text-[#94a3b8] font-mono">

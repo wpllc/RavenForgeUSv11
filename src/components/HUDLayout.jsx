@@ -30,9 +30,9 @@ export default function HUDLayout({ children }) {
     { path: '/evidence', label: 'Evidence', icon: Database },
     { path: '/assets', label: 'Assets', icon: Cpu },
     { path: '/findings', label: 'Findings', icon: AlertTriangle },
+    { path: '/audit-trail', label: 'Audit Trail', icon: Terminal },
     { path: '/review-queue', label: 'Review Queue', icon: CheckCircle },
     { path: '/reports', label: 'Reports', icon: BookOpen },
-    { path: '/audit-trail', label: 'Audit Trail', icon: Terminal },
     { path: '/how-it-works', label: 'How RavenForge Works', icon: Shield }
   ];
 

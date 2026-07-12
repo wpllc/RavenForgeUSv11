@@ -1,293 +1,450 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { 
-  FileText, Image, Clipboard, Eye, 
-  ChevronRight, AlertCircle, ArrowRight, ShieldCheck, CheckSquare, Search,
-  HelpCircle, Settings, CheckSquare as CheckIcon, ShieldAlert, BadgeInfo 
+  ChevronRight, ArrowRight, Check, AlertTriangle, ShieldCheck, 
+  HelpCircle, Eye, FileText, Database, ShieldAlert, Cpu, Layers, RefreshCw
 } from 'lucide-react';
-import { DEMO_DATA_LABEL, projectSummary } from '../data/demoData';
+import { projectSummary } from '../data/demoData';
 
 export default function GuidedDemo() {
-  const navigate = useNavigate();
-  const [currentStage, setCurrentStage] = useState(1);
+  const [activePhase, setActivePhase] = useState(1);
+  const [internalsExpanded, setInternalsExpanded] = useState(true);
 
-  const totalStages = 6;
+  const phases = [
+    { id: 1, label: 'Evidence Intake', status: 'COMPLETED' },
+    { id: 2, label: 'Organize and Identify', status: 'COMPLETED' },
+    { id: 3, label: 'Evaluate Findings', status: 'COMPLETED' },
+    { id: 4, label: 'Governance Review', status: 'AMBER' }, // Requires human review
+    { id: 5, label: 'Decision and Proof', status: 'APPROVED' }
+  ];
+
+  // 10 internal events linked 1-to-1 with the audit milestones
+  const internalEvents = [
+    { num: 1, label: 'Evidence received', phase: 1 },
+    { num: 2, label: 'Immutable audit ledger initialized', phase: 1 },
+    { num: 3, label: 'Original evidence appended', phase: 1 },
+    { num: 4, label: 'Evidence normalized and context preserved', phase: 2 },
+    { num: 5, label: 'Asset identity and sequence correlation performed', phase: 2 },
+    { num: 6, label: 'Findings and boundary rules evaluated', phase: 3 },
+    { num: 7, label: 'Confidence and admissibility checked', phase: 3 },
+    { num: 8, label: 'Human governance review performed', phase: 4 },
+    { num: 9, label: 'Human decision appended to ledger', phase: 4 },
+    { num: 10, label: 'Output package or revalidation trigger created', phase: 5 }
+  ];
+
+  // Audit rail milestones (recorded/appended language, visible throughout)
+  const auditRailMilestones = [
+    { id: 1, text: 'Evidence received', phase: 1, mockVal: '96 photos, GPS payload' },
+    { id: 2, text: 'Evidence appended', phase: 1, mockVal: 'Ledger block 0x8f2d initialized' },
+    { id: 3, text: 'Context recorded', phase: 1, mockVal: 'Inspection metadata aligned' },
+    { id: 4, text: 'Asset candidate recorded', phase: 2, mockVal: '8 unique assets mapped' },
+    { id: 5, text: 'Finding recorded', phase: 3, mockVal: '3 priority condition anomalies' },
+    { id: 6, text: 'Gate result recorded', phase: 3, mockVal: 'Blocked: Chiller OCR at 64%' },
+    { id: 7, text: 'Human review requested', phase: 4, mockVal: 'Escalated item: REV-001' },
+    { id: 8, text: 'Human decision recorded', phase: 4, mockVal: 'Operator resolved: CH-0915-B' },
+    { id: 9, text: 'Recommendation recorded', phase: 5, mockVal: 'AHU-02 replacement budgeted' },
+    { id: 10, text: 'Revalidation trigger retained', phase: 5, mockVal: 'Temporal decay watch activated' }
+  ];
 
   const handleNext = () => {
-    if (currentStage < totalStages) {
-      setCurrentStage(currentStage + 1);
-    } else {
-      navigate('/assets');
-    }
+    if (activePhase < 5) setActivePhase(activePhase + 1);
   };
 
   const handlePrev = () => {
-    if (currentStage > 1) {
-      setCurrentStage(currentStage - 1);
-    }
+    if (activePhase > 1) setActivePhase(activePhase - 1);
   };
 
   return (
-    <div className="space-y-6 flex flex-col h-full justify-between">
+    <div className="space-y-6">
       
-      {/* HEADER PROGRESS STATUS */}
-      <div className="flex flex-col gap-2 shrink-0">
-        <div className="flex justify-between items-center bg-[#131c2e] border border-[#334155]/60 p-4 rounded-lg">
-          <div className="font-sans text-xs">
-            <span className="text-[#64748b] font-mono">PILOT CASE STUDY:</span> <span className="text-white font-bold">{projectSummary.name}</span>
-          </div>
-          <div className="flex items-center gap-1 font-mono text-xs">
-            <span className="text-[#64748b]">NARRATIVE STEP:</span>
-            <span className="text-[#38bdf8] font-bold">{currentStage} / {totalStages}</span>
-          </div>
-        </div>
-
-        {/* PROGRESS INDICATOR BAR */}
-        <div className="w-full bg-[#0b0f19] border border-[#334155]/40 h-2.5 rounded-full overflow-hidden flex">
-          {Array.from({ length: totalStages }).map((_, idx) => (
-            <div 
-              key={idx} 
-              className={`h-full flex-1 transition-all duration-300 border-r border-[#0b0f19] ${
-                idx + 1 <= currentStage ? 'bg-[#38bdf8] shadow-[0_0_8px_rgba(56,189,248,0.4)]' : 'bg-[#131c2e]'
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* CORE DISPLAY (GRAPHIC + COPY + METRICS) */}
-      <div className="flex-1 min-h-[360px] py-2 flex flex-col md:flex-row gap-6 items-stretch">
-        
-        {/* LEFT COLUMN: NARRATIVE COPY & METRICS */}
-        <div className="flex-1 bg-[#131c2e]/40 border border-[#334155]/60 p-5 rounded-xl flex flex-col justify-between space-y-4">
-          
-          <div className="space-y-4">
-            <span className="inline-block text-[10px] font-mono text-[#38bdf8] border border-[#38bdf8]/30 px-2 py-0.5 rounded bg-[#38bdf8]/5 uppercase">
-              {currentStage === 1 && "Step 1: The Problem"}
-              {currentStage === 2 && "Step 2: Ingesting Evidence"}
-              {currentStage === 3 && "Step 3: Systematic Analysis"}
-              {currentStage === 4 && "Step 4: Human Review Gate"}
-              {currentStage === 5 && "Step 5: Operational Decision"}
-              {currentStage === 6 && "Step 6: Defensible Proof"}
-            </span>
-
-            <h2 className="text-xl font-bold tracking-tight text-white">
-              {currentStage === 1 && "Traditional Audits Lack Verifiable Decisional Lineage"}
-              {currentStage === 2 && "Physical Evidence Ingested and Logged"}
-              {currentStage === 3 && "Automated Entity Correlation and Deduplication"}
-              {currentStage === 4 && "Escalating Low Confidence Metrics"}
-              {currentStage === 5 && "Verification Actions: Human remains in Control"}
-              {currentStage === 6 && "Cryptographic Decision Ledger Packages Generated"}
-            </h2>
-
-            <p className="text-xs text-[#94a3b8] leading-relaxed font-sans">
-              {currentStage === 1 && (
-                "Traditional facility audits are inherently unreliable. Inspectors take hundreds of redundant photos of cooling towers and air handlers, copy serial numbers with grease-smudged nameplates, and upload reports to static spreadsheets. When capital planners allocate replacement budgets, they lack an auditable connection between the final spending decision and the raw physical evidence, leaving the portfolio exposed to risk and compliance failures."
-              )}
-              {currentStage === 2 && (
-                "RavenForge solves this by ingesting all field traces directly. In our pilot demonstration run, 96 raw photographs are loaded from inspection tablets along with metadata coordinates, timestamp registries, and site inspector logs. Nothing is edited or discarded. Every photograph is logged with its original file details, serving as the foundational physical evidence for the audit."
-              )}
-              {currentStage === 3 && (
-                "To streamline processing, RavenForge matches coordinate bounds and image similarity hashes to consolidate the 96 raw photographs into 13 photo sequences. It automatically identifies 8 unique assets. The engine then runs localized rule checks, validating the records against installation lifetimes and condition models, calculating statistical confidence limits for each asset profile."
-              )}
-              {currentStage === 4 && (
-                "Automated systems fail when they try to make decisions on blurred tags or ambiguous paint stains. Rather than hiding these anomalies under arbitrary averages, RavenForge identifies them and alerts inspectors. Here, nameplate readings on Chiller 02 have low OCR confidence (64%), and moisture stains near Pump 02 cannot be classified as active leaks or old stains. RavenForge blocks automatic action and escalates both to the operator queue."
-              )}
-              {currentStage === 5 && (
-                "Human operators inspect the side-by-side evidence details in the Review Queue. They can choose to Approve (if correct), Correct (if they can resolve the OCR text directly), Escalate (for a follow-up physical inspection), or Defer (postpone decision). This ensures that humans retain full operational control over the final audit records, with every manual action recorded to the audit trail."
-              )}
-              {currentStage === 6 && (
-                "Once all escalations are resolved, the system compiles a Chained Audit Package. Each asset finding and decision outcome is bound together with cryptographic SHA-256 block signatures. This output package links every recommendation directly to its original photos, giving asset managers, compliance officers, and regulators complete, verifiable proof of decisions."
-              )}
-            </p>
-          </div>
-
-          {/* TELEMETRY KEY METRICS BOX */}
-          <div className="bg-[#0b0f19] p-4 border border-[#334155]/40 rounded-lg font-mono text-[10px] space-y-2.5">
-            <div className="text-[#64748b] uppercase tracking-widest text-[9px]">Demo Telemetry Summary</div>
+      {/* 1. COMPACT FIVE-PHASE PROCESS SELECTOR BAR (Primary Navigation) */}
+      <nav className="w-full bg-[#131c2e] border border-[#334155]/60 rounded-lg p-2 z-30 shrink-0" aria-label="Demo Phase Selector">
+        <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2 justify-between items-stretch">
+          {phases.map((phase) => {
+            const isActive = phase.id === activePhase;
+            const isCompleted = phase.id < activePhase;
+            const isReview = phase.id === 4;
+            const isApproved = phase.id === 5 && activePhase === 5;
             
-            <div className="grid grid-cols-2 gap-3 text-[#94a3b8]">
-              {currentStage === 1 && (
-                <>
-                  <div><span className="text-[#64748b]">INSPECTION TRACES:</span> <span className="text-red-400 font-bold">Unverifiable</span></div>
-                  <div><span className="text-[#64748b]">BUDGET DECISIONS:</span> <span className="text-red-400 font-bold">No Lineage</span></div>
-                  <div><span className="text-[#64748b]">DATA STRUCTURE:</span> <span className="text-white">Static Spreadsheets</span></div>
-                  <div><span className="text-[#64748b]">AUDIT STATUS:</span> <span className="text-amber-500 font-bold">EXPOSED</span></div>
-                </>
-              )}
-              {currentStage === 2 && (
-                <>
-                  <div><span className="text-[#64748b]">RAW PHOTOS INGESTED:</span> <span className="text-white font-bold">96 Frames</span></div>
-                  <div><span className="text-[#64748b]">GPS TAGS DETECTED:</span> <span className="text-white font-bold">13 Coordinates</span></div>
-                  <div><span className="text-[#64748b]">EXIF PARSING STATE:</span> <span className="text-[#38bdf8] font-bold">COMPLETED</span></div>
-                  <div><span className="text-[#64748b]">LEDGER INITIALIZED:</span> <span className="text-[#22c55e] font-bold">READY</span></div>
-                </>
-              )}
-              {currentStage === 3 && (
-                <>
-                  <div><span className="text-[#64748b]">PHOTOS GROUPED:</span> <span className="text-white font-bold">96 to 13 Sequences</span></div>
-                  <div><span className="text-[#64748b]">UNIQUE ASSETS:</span> <span className="text-[#38bdf8] font-bold">8 Mapped</span></div>
-                  <div><span className="text-[#64748b]">DUPLICATES DISCOVERED:</span> <span className="text-white font-bold">83 Frames</span></div>
-                  <div><span className="text-[#64748b]">RULE CHECKS RUN:</span> <span className="text-[#22c55e] font-bold">32 Passes</span></div>
-                </>
-              )}
-              {currentStage === 4 && (
-                <>
-                  <div><span className="text-[#64748b]">RULE ANOMALIES:</span> <span className="text-amber-500 font-bold">3 Findings</span></div>
-                  <div><span className="text-[#64748b]">LOW-CONFIDENCE GATES:</span> <span className="text-amber-400 font-bold">2 Escalations</span></div>
-                  <div><span className="text-[#64748b]">SYSTEM AUTOMATION:</span> <span className="text-[#ef4444] font-bold">LOCKED</span></div>
-                  <div><span className="text-[#64748b]">CONFIDENCE THRESHOLD:</span> <span className="text-white">75% Limit</span></div>
-                </>
-              )}
-              {currentStage === 5 && (
-                <>
-                  <div><span className="text-[#64748b]">OPERATOR ACTIONS:</span> <span className="text-[#38bdf8] font-bold">Approve, Correct</span></div>
-                  <div><span className="text-[#64748b]">PENDING REVIEWS:</span> <span className="text-amber-400 font-bold">2 Items</span></div>
-                  <div><span className="text-[#64748b]">HUMAN OVERRIDES:</span> <span className="text-white">Logged to Ledger</span></div>
-                  <div><span className="text-[#64748b]">SYSTEM ESCALATIONS:</span> <span className="text-[#22c55e] font-bold">0 Active in Pilot</span></div>
-                </>
-              )}
-              {currentStage === 6 && (
-                <>
-                  <div><span className="text-[#64748b]">LEDGER HASH CHAIN:</span> <span className="text-[#22c55e] font-bold">SECURED</span></div>
-                  <div><span className="text-[#64748b]">REPORTS AVAILABLE:</span> <span className="text-white">6 Demo Summaries</span></div>
-                  <div><span className="text-[#64748b]">VERIFICATION CHECKS:</span> <span className="text-white font-bold">32 Passed</span></div>
-                  <div><span className="text-[#64748b]">BLOCK RECORD HASH:</span> <span className="text-[#38bdf8] font-bold">0x8f2d...b9c</span></div>
-                </>
-              )}
+            // Custom Phase styles based on logic requirements
+            let btnClass = 'text-[#64748b] hover:text-white bg-transparent border-transparent';
+            let statusDot = <span className="h-2 w-2 rounded-full bg-[#64748b]" />;
+            
+            if (isActive) {
+              if (isReview) {
+                btnClass = 'bg-amber-500/10 border-amber-500 text-amber-500 font-bold';
+                statusDot = <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />;
+              } else {
+                btnClass = 'bg-[#38bdf8]/10 border-[#38bdf8] text-[#38bdf8] font-bold';
+                statusDot = <span className="h-2 w-2 rounded-full bg-[#38bdf8]" />;
+              }
+            } else if (isCompleted) {
+              btnClass = 'bg-[#1e293b]/40 border-[#334155]/30 text-[#94a3b8]';
+              statusDot = <Check size={12} className="text-[#94a3b8]" />;
+            }
+
+            return (
+              <button
+                key={phase.id}
+                onClick={() => setActivePhase(phase.id)}
+                className={`flex-1 flex items-center justify-center sm:justify-start gap-2.5 py-2 px-3 border rounded-md text-xs transition-all uppercase font-mono tracking-wider ${btnClass}`}
+              >
+                {statusDot}
+                <span className="text-left font-semibold">
+                  {phase.id}. {phase.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+
+      {/* 2. TWO COLUMN SYNCHRONIZED DISPLAY PANEL */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        
+        {/* LEFT COLUMN: OPERATIONAL STATE PANEL (Plain-Language & Action-Oriented) */}
+        <section className="lg:col-span-6 card bg-[#131c2e]/40 border-[#334155]/60 flex flex-col justify-between p-5 space-y-6">
+          <div className="space-y-4">
+            <div className="flex justify-between items-center pb-2 border-b border-[#334155]/30">
+              <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+                Operational State
+              </h2>
+              <span className="text-[10px] font-mono text-[#64748b]">HUMAN PORTAL VIEW</span>
+            </div>
+
+            {/* Case State */}
+            <div className="space-y-1">
+              <span className="text-[9px] font-mono text-[#64748b] uppercase block">Current Case State</span>
+              <p className="text-sm text-white font-medium">
+                {activePhase === 1 && "Ingesting new facility condition evidence package."}
+                {activePhase === 2 && "Deduplicating photograph traces into asset sequences."}
+                {activePhase === 3 && "Evaluating condition findings and safety parameters."}
+                {activePhase === 4 && "Human verification required: Admissibility limits triggered."}
+                {activePhase === 5 && "Audit verification completed. Recommendations approved."}
+              </p>
+            </div>
+
+            {/* Active Context */}
+            <div className="space-y-1 bg-[#0b0f19] p-3 rounded-lg border border-[#334155]/30">
+              <span className="text-[9px] font-mono text-[#64748b] uppercase block mb-1">Evidence & Asset Context</span>
+              <div className="text-xs text-[#94a3b8] space-y-1">
+                {activePhase === 1 && (
+                  <>
+                    <div><span className="text-[#64748b]">Evidence Stream:</span> 96 inspection photographs</div>
+                    <div><span className="text-[#64748b]">Origin:</span> iOS Field Inspection Client</div>
+                  </>
+                )}
+                {activePhase === 2 && (
+                  <>
+                    <div><span className="text-[#64748b]">Normalization Target:</span> 96 photos grouped to 13 sequences</div>
+                    <div><span className="text-[#64748b]">Asset Resolution:</span> 8 unique physical assets identified</div>
+                  </>
+                )}
+                {activePhase === 3 && (
+                  <>
+                    <div><span className="text-[#64748b]">Condition Anomaly:</span> Cabinet corrosion identified on AHU-02</div>
+                    <div><span className="text-[#64748b]">Evaluation Rule:</span> Operating service-life limits</div>
+                  </>
+                )}
+                {activePhase === 4 && (
+                  <>
+                    <div><span className="text-[#64748b]">Low-Confidence Item:</span> Chiller 02 Serial OCR at 64%</div>
+                    <div><span className="text-[#64748b]">Safety Gate Block:</span> Blocked automatic decision compilation</div>
+                  </>
+                )}
+                {activePhase === 5 && (
+                  <>
+                    <div><span className="text-[#64748b]">Approved Finding:</span> AHU-02 mechanical corrosion replacement</div>
+                    <div><span className="text-[#64748b]">Decision Sign-off:</span> Verified by Operator 1</div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* What Changed */}
+            <div className="space-y-1 text-xs">
+              <span className="text-[9px] font-mono text-[#64748b] uppercase block">What Changed This Phase</span>
+              <p className="text-[#94a3b8] leading-relaxed">
+                {activePhase === 1 && "Physical records are appended directly to the audit ledger upon entering the system, ensuring complete history. No findings or replacements have been analyzed yet."}
+                {activePhase === 2 && "Redundant raw photos are grouped into 13 sequences, deduplicating records. Photos are linked directly to unique assets (such as AHU-01 and Chiller-01) for physical context."}
+                {activePhase === 3 && "Asset condition values are evaluated. Anomaly models detect severe cabinet corrosion on AHU-02 and coolant leaks on Pump-02. Automation continues for nominal systems but locks on low-confidence inputs."}
+                {activePhase === 4 && "The system halts processing and raises a review task. The operator compares the close-up photos to correct the serial string and verify basement water stains."}
+                {activePhase === 5 && (
+                  <>
+                    The human operator's actions have resolved all active reviews. The final approved replacement recommendation is ready, and a persistent watch trigger is set to monitor future evidence.
+                  </>
+                )}
+              </p>
+            </div>
+
+            {/* Human Actions & Next States */}
+            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-[#334155]/20 text-xs">
+              <div>
+                <span className="text-[9px] font-mono text-[#64748b] uppercase block mb-1">Human Action Required</span>
+                <div className="font-semibold">
+                  {activePhase === 1 && <span className="text-[#64748b]">None (System Intake)</span>}
+                  {activePhase === 2 && <span className="text-[#64748b]">None (System Sorting)</span>}
+                  {activePhase === 3 && <span className="text-[#64748b]">None (System Evaluation)</span>}
+                  {activePhase === 4 && <span className="text-amber-500 font-bold">Approve, Correct, or Escalate</span>}
+                  {activePhase === 5 && <span className="text-[#22c55e] font-bold">None (Audit Log Signed)</span>}
+                </div>
+              </div>
+              <div>
+                <span className="text-[9px] font-mono text-[#64748b] uppercase block mb-1">Potential Next States</span>
+                <ul className="list-disc list-inside text-[#94a3b8] space-y-0.5 text-[11px]">
+                  {activePhase === 1 && (
+                    <>
+                      <li>Evidence Accepted</li>
+                      <li>Intake Rejected</li>
+                    </>
+                  )}
+                  {activePhase === 2 && (
+                    <>
+                      <li>Inventory Mapped</li>
+                      <li>Unidentified Asset</li>
+                    </>
+                  )}
+                  {activePhase === 3 && (
+                    <>
+                      <li>Admissible Plan</li>
+                      <li>Gated / Blocked</li>
+                    </>
+                  )}
+                  {activePhase === 4 && (
+                    <>
+                      <li>Approved Finding</li>
+                      <li>Escalated Field Check</li>
+                      <li>Hold engaged</li>
+                    </>
+                  )}
+                  {activePhase === 5 && (
+                    <>
+                      <li>Locked Report Preview</li>
+                      <li>Reopened by new photos</li>
+                    </>
+                  )}
+                </ul>
+              </div>
             </div>
           </div>
 
-        </div>
+          {/* STATE MAP DECISION NAVIGATOR (Static Context Indicator) */}
+          <div className="bg-[#0b0f19] p-4 border border-[#334155]/40 rounded-lg space-y-3 shrink-0">
+            <div className="flex justify-between items-center text-[9px] font-mono text-[#64748b]">
+              <span>CONTEXT: DECISION STATE MAP</span>
+              <span>PROGRESSIVE STATUS</span>
+            </div>
 
-        {/* RIGHT COLUMN: GRAPHICS CONTAINER */}
-        <div className="flex-1 bg-[#131c2e]/40 border border-[#334155]/60 p-5 rounded-xl flex flex-col justify-center items-center relative overflow-hidden min-h-[300px]">
+            <div className="flex items-center justify-between gap-1 text-[10px] font-mono">
+              {/* Previous state */}
+              <div className="text-center flex-1 bg-[#131c2e]/60 p-1.5 rounded border border-[#334155]/30 text-[#64748b]">
+                <div className="text-[8px] text-[#64748b] uppercase scale-90">PREVIOUS</div>
+                <div className="truncate font-semibold mt-0.5">
+                  {activePhase === 1 ? 'NONE' : phases[activePhase - 2].label}
+                </div>
+              </div>
+
+              <div className="text-slate-600 font-bold">&rarr;</div>
+
+              {/* Current state */}
+              <div className={`text-center flex-1 p-1.5 rounded border font-bold ${
+                activePhase === 4 
+                  ? 'bg-amber-500/10 border-amber-500 text-amber-500' 
+                  : activePhase === 5
+                    ? 'bg-[#22c55e]/15 border-[#22c55e] text-[#22c55e]'
+                    : 'bg-[#38bdf8]/10 border-[#38bdf8] text-[#38bdf8]'
+              }`}>
+                <div className="text-[8px] uppercase scale-90">CURRENT</div>
+                <div className="truncate mt-0.5">{phases[activePhase - 1].label}</div>
+              </div>
+
+              <div className="text-slate-600 font-bold">&rarr;</div>
+
+              {/* Next states */}
+              <div className="text-center flex-1 bg-[#131c2e]/60 p-1.5 rounded border border-[#334155]/30 text-[#94a3b8]">
+                <div className="text-[8px] text-[#64748b] uppercase scale-90">NEXT OPTION</div>
+                <div className="truncate font-semibold mt-0.5">
+                  {activePhase === 5 ? 'REOPEN ON NEW DATA' : activePhase === 3 ? 'GATED REVIEW' : phases[activePhase].label}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* RIGHT COLUMN: RAVENFORGE INTERNALS PANEL */}
+        <section className="lg:col-span-6 flex flex-col justify-between gap-6">
           
-          {/* STAGE 1 GRAPHIC: PROBLEM STATEMENT */}
-          {currentStage === 1 && (
-            <div className="w-full space-y-4 relative z-10 font-sans text-xs text-center max-w-sm">
-              <div className="h-12 w-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mx-auto mb-4 animate-bounce">
-                <ShieldAlert size={24} />
+          {/* Main Internals Card */}
+          <div className="card bg-[#131c2e]/40 border-[#334155]/60 flex-1 flex flex-col justify-between p-5 space-y-4">
+            
+            <div className="space-y-4">
+              <div className="flex justify-between items-center pb-2 border-b border-[#334155]/30">
+                <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                  <Cpu size={16} className="text-[#38bdf8]" />
+                  RavenForge Internals
+                </h2>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => setInternalsExpanded(!internalsExpanded)}
+                    className="lg:hidden text-xs text-[#38bdf8] hover:text-white px-2.5 py-1 rounded border border-[#334155]/50 bg-[#0b0f19]/30"
+                  >
+                    {internalsExpanded ? 'Collapse' : 'Expand'}
+                  </button>
+                  <span className="text-[10px] font-mono text-[#64748b] hidden sm:inline">SYSTEM LOGS VIEW</span>
+                </div>
               </div>
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">Unverified Action Loop</h3>
-              <p className="text-[#94a3b8] leading-relaxed">
-                Decisions on multi-million dollar asset replacements are made on static reports without direct visual, spatial, or chronological tracking.
-              </p>
-            </div>
-          )}
 
-          {/* STAGE 2 GRAPHIC: EVIDENCE INGESTION */}
-          {currentStage === 2 && (
-            <div className="w-full space-y-4 relative z-10 font-mono text-[10px]">
-              <div className="grid grid-cols-3 gap-2.5 max-w-xs mx-auto text-center">
-                <div className="bg-[#0b0f19] border border-[#334155] p-2 rounded flex flex-col items-center">
-                  <Image size={16} className="text-[#38bdf8] mb-1" />
-                  <span className="text-white">IMG_0031.JPG</span>
+              {/* Collapsible content wrapper */}
+              <div className={internalsExpanded ? 'space-y-4 flex-1 flex flex-col justify-between' : 'hidden lg:flex lg:flex-col lg:justify-between lg:flex-1 lg:space-y-4'}>
+                {/* Phase Specific Internals content */}
+                <div className="space-y-3 text-xs">
+                  <span className="text-[9px] font-mono text-[#64748b] uppercase block">Governed System Activity</span>
+                  
+                  {activePhase === 1 && (
+                    <ul className="space-y-2 list-disc list-inside text-[#94a3b8]">
+                      <li>Original evidence file identifiers and sequence keys generated.</li>
+                      <li>Audit ledger initialized. No diagnostic recommendations generated yet.</li>
+                      <li>Original photographic metadata (EXIF GPS stamps, dates) saved.</li>
+                      <li>Ledger integrity checklist verified (32/32 rules initialized).</li>
+                    </ul>
+                  )}
+                  {activePhase === 2 && (
+                    <ul className="space-y-2 list-disc list-inside text-[#94a3b8]">
+                      <li>Photographs evaluated. Visual similarity grouped 96 images to 13 sequences.</li>
+                      <li>Asset candidate generated based on location coordinate boundaries.</li>
+                      <li>Mapped 8 unique assets. Duplicate files are linked under parent groups.</li>
+                      <li>Audit trail updated with deduplication logs.</li>
+                    </ul>
+                  )}
+                  {activePhase === 3 && (
+                    <ul className="space-y-2 list-disc list-inside text-[#94a3b8]">
+                      <li>Condition findings generated by local analysis models.</li>
+                      <li>Mechanical operating lifetimes checked. Cabinet corrosion logged for AHU-02.</li>
+                      <li>Confidence gate triggered. Chiller nameplate serial key confidence falls below 75%.</li>
+                      <li>Automatic decision generation is **blocked**, routing exceptions to queue.</li>
+                    </ul>
+                  )}
+                  {activePhase === 4 && (
+                    <ul className="space-y-2 list-disc list-inside text-[#94a3b8]">
+                      <li>Admissibility gate exception log created: **OCR serial low confidence (64%)**.</li>
+                      <li>Review package assembled, showing close-up photo reference.</li>
+                      <li>Operator inputs received: serial corrected to **CH-0915-B**.</li>
+                      <li>Operator's manual sign-off recorded to the decision ledger.</li>
+                    </ul>
+                  )}
+                  {activePhase === 5 && (
+                    <ul className="space-y-2 list-disc list-inside text-[#94a3b8]">
+                      <li>Recommendations linked to verified physical photographs.</li>
+                      <li>Chained decision ledger package finalized and sealed.</li>
+                      <li>Dormant asset branches and revalidation check loops initialized.</li>
+                      <li>System transitions back to active transponder watch state.</li>
+                    </ul>
+                  )}
                 </div>
-                <div className="bg-[#0b0f19] border border-[#334155] p-2 rounded flex flex-col items-center">
-                  <Image size={16} className="text-[#38bdf8] mb-1" />
-                  <span className="text-white">IMG_0045.JPG</span>
+
+                {/* 10-Event Lifecycle Progress (Nested within phases) */}
+                <div className="space-y-2 pt-2 border-t border-[#334155]/20">
+                  <span className="text-[9px] font-mono text-[#64748b] uppercase block">System Lifecycle Events</span>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-[9px]">
+                    {internalEvents.map((evt) => {
+                      const isCurrentPhaseEvent = evt.phase === activePhase;
+                      const isPassedEvent = evt.phase < activePhase;
+                      let textClass = 'text-[#64748b]';
+                      let dotColor = 'bg-[#131c2e]';
+
+                      if (isCurrentPhaseEvent) {
+                        textClass = 'text-[#38bdf8] font-bold';
+                        dotColor = 'bg-[#38bdf8]';
+                      } else if (isPassedEvent) {
+                        textClass = 'text-[#94a3b8]';
+                        dotColor = 'bg-[#334155]';
+                      }
+
+                      return (
+                        <div key={evt.num} className={`flex items-center gap-1.5 ${textClass}`}>
+                          <span className={`h-1.5 w-1.5 rounded-full ${dotColor}`} />
+                          <span>{evt.num}. {evt.label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="bg-[#0b0f19] border border-[#334155] p-2 rounded flex flex-col items-center">
-                  <FileText size={16} className="text-amber-500 mb-1" />
-                  <span className="text-white">GPS_LOGS</span>
+
+                {/* EXPANDABLE DETAILS */}
+                <div className="pt-2 border-t border-[#334155]/20 shrink-0">
+                  <details className="expandable-details" style={{ margin: 0 }}>
+                    <summary>View Decisional Registry Hash</summary>
+                    <div className="raw-json-block text-left mt-2">
+{`{
+  "phase_id": ${activePhase},
+  "phase_label": "${phases[activePhase - 1].label}",
+  "validation_tests_run": 32,
+  "validation_status": "${activePhase === 4 ? 'GATE_HOLD' : 'PASS'}",
+  "demo_ledger_hash": "0x8f2d512b${activePhase * 1010}b9c",
+  "active_revalidation_check": ${activePhase === 5 ? 'true' : 'false'}
+}`}
+                    </div>
+                  </details>
                 </div>
-              </div>
-              <div className="text-center text-[#64748b] text-[9px] max-w-xs mx-auto leading-relaxed font-sans">
-                Evidence logs record coordinate coordinates and ingestion times directly from field devices, creating a traceable baseline.
               </div>
             </div>
-          )}
+          </div>
 
-          {/* STAGE 3 GRAPHIC: ANALYSIS */}
-          {currentStage === 3 && (
-            <div className="w-full space-y-4 relative z-10 font-mono text-[9px] max-w-md">
-              <div className="flex justify-between items-center px-4">
-                <div className="bg-[#0b0f19] border border-[#334155] p-2 rounded text-center w-[75px]">
-                  <Image size={14} className="mx-auto text-[#38bdf8] mb-1" />
-                  <span className="text-white">96 Photos</span>
-                </div>
-                <div className="text-[#64748b] font-bold">&rarr;</div>
-                <div className="bg-[#0b0f19] border border-[#334155] p-2 rounded text-center w-[75px]">
-                  <Search size={14} className="mx-auto text-[#38bdf8] mb-1" />
-                  <span className="text-white">13 Seq</span>
-                </div>
-                <div className="text-[#64748b] font-bold">&rarr;</div>
-                <div className="bg-[#0b0f19] border border-[#334155] p-2 rounded text-center w-[75px]">
-                  <Settings size={14} className="mx-auto text-[#38bdf8] mb-1" />
-                  <span className="text-white">8 Assets</span>
-                </div>
-              </div>
-              <div className="text-center text-[#64748b] text-[9px] leading-relaxed font-sans max-w-xs mx-auto">
-                Consolidating duplicate traces and matching records to inventory registers prevents duplicate audit records.
+          {/* PERSISTENT AUDIT RAIL CONTAINER */}
+          <div className="card bg-[#131c2e]/60 border-[#334155]/60 p-5 space-y-3 shrink-0">
+            <div className="text-[10px] text-[#64748b] font-mono uppercase tracking-wider">
+              Persistent Audit Rail (Timeline)
+            </div>
+
+            {/* Audit Rail timeline bar */}
+            <div className="overflow-x-auto pb-1">
+              <div className="flex gap-4 min-w-[640px] relative font-mono text-[9px]">
+                {auditRailMilestones.map((milestone) => {
+                  const isCurrent = milestone.phase === activePhase;
+                  const isPassed = milestone.phase < activePhase;
+                  
+                  let borderStyle = 'border-[#334155] bg-[#0b0f19] text-[#64748b]';
+                  if (isCurrent) {
+                    borderStyle = 'border-[#38bdf8] bg-[#38bdf8]/10 text-white font-bold';
+                  } else if (isPassed) {
+                    borderStyle = 'border-[#334155] bg-[#1e293b]/30 text-[#94a3b8]';
+                  }
+
+                  return (
+                    <div 
+                      key={milestone.id} 
+                      className={`flex-1 p-2 rounded border leading-tight flex flex-col justify-between ${borderStyle}`}
+                    >
+                      <div>
+                        <div className="text-[#64748b] uppercase scale-90 origin-left">
+                          LOG {milestone.id}
+                        </div>
+                        <div className="mt-1 font-semibold">{milestone.text}</div>
+                      </div>
+                      <div className="text-[8px] text-[#64748b] mt-2 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
+                        {milestone.mockVal}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          )}
-
-          {/* STAGE 4 GRAPHIC: HUMAN REVIEW GATE */}
-          {currentStage === 4 && (
-            <div className="w-full space-y-4 relative z-10 font-mono text-[9px]">
-              <div className="max-w-xs mx-auto flex flex-col gap-2">
-                <div className="flex items-center justify-between border border-[#334155] bg-[#0b0f19] px-3 py-1.5 rounded">
-                  <span className="text-[#94a3b8]">Chiller 02 Nameplate OCR</span>
-                  <span className="badge badge-amber">64% CONFIDENCE</span>
-                </div>
-                <div className="flex items-center justify-between border border-[#334155] bg-[#0b0f19] px-3 py-1.5 rounded">
-                  <span className="text-[#94a3b8]">Pump 02 Moisture Pattern</span>
-                  <span className="badge badge-amber">72% CONFIDENCE</span>
-                </div>
-              </div>
-              <p className="text-center text-[#94a3b8] text-[9px] font-sans max-w-xs mx-auto">
-                Decisions violating confidence thresholds are blocked from automatic output and sent to human operators.
-              </p>
+            
+            <div className="text-[8px] text-[#64748b] font-mono">
+              * The audit rail demonstrates that all evidence is appended to the ledger before reviews are generated and recorded.
             </div>
-          )}
+          </div>
 
-          {/* STAGE 5 GRAPHIC: OPERATIONAL DECISION */}
-          {currentStage === 5 && (
-            <div className="w-full space-y-4 relative z-10 font-sans text-xs max-w-md">
-              <div className="border border-[#334155] bg-[#0b0f19] p-4 rounded-lg space-y-3">
-                <div className="flex justify-between items-center pb-2 border-b border-[#334155]/40 font-mono text-[10px]">
-                  <span className="text-white font-bold">RE-LOG: CH-0915-B</span>
-                  <span className="text-[#64748b]">OCR CORRECTION</span>
-                </div>
-                <div className="flex justify-center gap-2">
-                  <span className="badge badge-green">APPROVE</span>
-                  <span className="badge badge-blue">CORRECT</span>
-                  <span className="badge badge-amber">ESCALATE</span>
-                  <span className="badge badge-red">DEFER</span>
-                </div>
-                <p className="text-[10px] text-[#94a3b8] text-center">
-                  Operators use physical photographs to resolve OCR text gaps and verify water seepage context.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* STAGE 6 GRAPHIC: DEFENSIBLE PROOF */}
-          {currentStage === 6 && (
-            <div className="w-full space-y-4 relative z-10 font-sans text-xs text-center max-w-sm">
-              <div className="h-12 w-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-[#22c55e] mx-auto mb-4">
-                <FileCheck size={24} />
-              </div>
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider font-mono">Chained Decision Package</h3>
-              <p className="text-[#94a3b8] leading-relaxed text-[10px]">
-                Recommendations are bound in a secure cryptographic hash chain, allowing any regulator to trace decisions back to photographs.
-              </p>
-            </div>
-          )}
-
-        </div>
+        </section>
 
       </div>
 
-      {/* FOOTER ACTIONS AND STEPS */}
-      <div className="flex justify-between items-center shrink-0 pt-3 border-t border-[#334155]/60 font-mono text-xs">
+      {/* 3. STEP BACK & CONTINUE ACTIONS FOOTER */}
+      <div className="flex justify-between items-center pt-4 border-t border-[#334155]/60 font-mono text-xs z-30 shrink-0">
         <button
           onClick={handlePrev}
-          disabled={currentStage === 1}
+          disabled={activePhase === 1}
           className={`px-4 py-2 border rounded-lg font-semibold transition ${
-            currentStage === 1 
+            activePhase === 1 
               ? 'border-slate-800 text-slate-600 cursor-not-allowed' 
               : 'border-[#334155] text-[#94a3b8] hover:border-[#64748b]'
           }`}
@@ -295,24 +452,23 @@ export default function GuidedDemo() {
           &larr; Back
         </button>
 
-        <div className="text-[10px] text-[#64748b] hidden sm:block">
-          DEMONSTRATION SIMULATOR
+        <div className="text-[10px] text-[#64748b]">
+          DEMO MODE: SCENARIO VALIDATION
         </div>
 
         <button
           onClick={handleNext}
-          className="bg-[#0284c7] hover:bg-[#38bdf8] text-white px-5 py-2.5 rounded-lg font-semibold transition flex items-center gap-1.5 shadow-md"
+          className={`px-5 py-2.5 rounded-lg font-semibold transition flex items-center gap-1.5 shadow-md ${
+            activePhase === 5 
+              ? 'bg-[#22c55e] text-white hover:bg-emerald-600' 
+              : 'bg-[#0284c7] hover:bg-[#38bdf8] text-white'
+          }`}
         >
-          <span>{currentStage === totalStages ? "Explore Dashboard" : "Continue"}</span>
+          <span>{activePhase === 5 ? "Go to Assets Dashboard" : "Continue"}</span>
           <ChevronRight size={14} />
         </button>
       </div>
 
     </div>
   );
-}
-
-// Simple internal icon for placeholder graphics
-function FileCheck({ size, className }) {
-  return <ShieldCheck size={size} className={className} />;
 }
