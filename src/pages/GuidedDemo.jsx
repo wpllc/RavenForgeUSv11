@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   ChevronRight, ArrowRight, Check, AlertTriangle, ShieldCheck, 
   HelpCircle, Eye, FileText, Database, ShieldAlert, Cpu, Layers, RefreshCw
@@ -6,6 +7,7 @@ import {
 import { projectSummary } from '../data/demoData';
 
 export default function GuidedDemo() {
+  const navigate = useNavigate();
   const [activePhase, setActivePhase] = useState(1);
   const [internalsExpanded, setInternalsExpanded] = useState(true);
 
@@ -33,20 +35,24 @@ export default function GuidedDemo() {
 
   // Audit rail milestones (recorded/appended language, visible throughout)
   const auditRailMilestones = [
-    { id: 1, text: 'Evidence received', phase: 1, mockVal: '96 photos, GPS payload' },
-    { id: 2, text: 'Evidence appended', phase: 1, mockVal: 'Ledger block 0x8f2d initialized' },
-    { id: 3, text: 'Context recorded', phase: 1, mockVal: 'Inspection metadata aligned' },
-    { id: 4, text: 'Asset candidate recorded', phase: 2, mockVal: '8 unique assets mapped' },
-    { id: 5, text: 'Finding recorded', phase: 3, mockVal: '3 priority condition anomalies' },
-    { id: 6, text: 'Gate result recorded', phase: 3, mockVal: 'Blocked: Chiller OCR at 64%' },
-    { id: 7, text: 'Human review requested', phase: 4, mockVal: 'Escalated item: REV-001' },
-    { id: 8, text: 'Human decision recorded', phase: 4, mockVal: 'Operator resolved: CH-0915-B' },
-    { id: 9, text: 'Recommendation recorded', phase: 5, mockVal: 'AHU-02 replacement budgeted' },
-    { id: 10, text: 'Revalidation trigger retained', phase: 5, mockVal: 'Temporal decay watch activated' }
+    { id: 1, text: 'Evidence received', phase: 1, mockVal: '96 photos, Available file metadata (Demo Placeholder)' },
+    { id: 2, text: 'Evidence appended', phase: 1, mockVal: 'Ledger block 0x8f2d (Demo Placeholder)' },
+    { id: 3, text: 'Context recorded', phase: 1, mockVal: 'Inspection metadata aligned (Demo Placeholder)' },
+    { id: 4, text: 'Asset candidate recorded', phase: 2, mockVal: '8 unique assets mapped (Demo Placeholder)' },
+    { id: 5, text: 'Finding recorded', phase: 3, mockVal: '3 priority condition anomalies (Demo Placeholder)' },
+    { id: 6, text: 'Gate result recorded', phase: 3, mockVal: 'Blocked: Chiller OCR at 64% (Demo Placeholder)' },
+    { id: 7, text: 'Human review requested', phase: 4, mockVal: 'Escalated item: REV-001 (Demo Placeholder)' },
+    { id: 8, text: 'Human decision recorded', phase: 4, mockVal: 'Operator resolved: CH-0915-B (Demo Placeholder)' },
+    { id: 9, text: 'Recommendation recorded', phase: 5, mockVal: 'AHU-02 replacement cost estimate recommended (Demo Placeholder)' },
+    { id: 10, text: 'Revalidation trigger retained', phase: 5, mockVal: 'Temporal decay watch activated (Demo Placeholder)' }
   ];
 
   const handleNext = () => {
-    if (activePhase < 5) setActivePhase(activePhase + 1);
+    if (activePhase < 5) {
+      setActivePhase(activePhase + 1);
+    } else {
+      navigate('/assets');
+    }
   };
 
   const handlePrev = () => {
@@ -63,7 +69,6 @@ export default function GuidedDemo() {
             const isActive = phase.id === activePhase;
             const isCompleted = phase.id < activePhase;
             const isReview = phase.id === 4;
-            const isApproved = phase.id === 5 && activePhase === 5;
             
             // Custom Phase styles based on logic requirements
             let btnClass = 'text-[#64748b] hover:text-white bg-transparent border-transparent';
@@ -119,7 +124,7 @@ export default function GuidedDemo() {
                 {activePhase === 2 && "Deduplicating photograph traces into asset sequences."}
                 {activePhase === 3 && "Evaluating condition findings and safety parameters."}
                 {activePhase === 4 && "Human verification required: Admissibility limits triggered."}
-                {activePhase === 5 && "Audit verification completed. Recommendations approved."}
+                {activePhase === 5 && "Audit verification completed. Recommendation recorded for planning review."}
               </p>
             </div>
 
@@ -130,7 +135,7 @@ export default function GuidedDemo() {
                 {activePhase === 1 && (
                   <>
                     <div><span className="text-[#64748b]">Evidence Stream:</span> 96 inspection photographs</div>
-                    <div><span className="text-[#64748b]">Origin:</span> iOS Field Inspection Client</div>
+                    <div><span className="text-[#64748b]">Origin:</span> Field inspection photo set</div>
                   </>
                 )}
                 {activePhase === 2 && (
@@ -153,7 +158,7 @@ export default function GuidedDemo() {
                 )}
                 {activePhase === 5 && (
                   <>
-                    <div><span className="text-[#64748b]">Approved Finding:</span> AHU-02 mechanical corrosion replacement</div>
+                    <div><span className="text-[#64748b]">Recorded Finding:</span> AHU-02 mechanical inspection recommended</div>
                     <div><span className="text-[#64748b]">Decision Sign-off:</span> Verified by Operator 1</div>
                   </>
                 )}
@@ -170,7 +175,7 @@ export default function GuidedDemo() {
                 {activePhase === 4 && "The system halts processing and raises a review task. The operator compares the close-up photos to correct the serial string and verify basement water stains."}
                 {activePhase === 5 && (
                   <>
-                    The human operator's actions have resolved all active reviews. The final approved replacement recommendation is ready, and a persistent watch trigger is set to monitor future evidence.
+                    The human operator's actions have resolved all active reviews. The replacement cost estimate recommended is ready, and a recommendation recorded for planning review has been appended. A revalidation trigger is set to monitor future evidence, retaining the ability for new field photographs to reopen the evaluation if condition decay is detected.
                   </>
                 )}
               </p>
@@ -184,8 +189,8 @@ export default function GuidedDemo() {
                   {activePhase === 1 && <span className="text-[#64748b]">None (System Intake)</span>}
                   {activePhase === 2 && <span className="text-[#64748b]">None (System Sorting)</span>}
                   {activePhase === 3 && <span className="text-[#64748b]">None (System Evaluation)</span>}
-                  {activePhase === 4 && <span className="text-amber-500 font-bold">Approve, Correct, or Escalate</span>}
-                  {activePhase === 5 && <span className="text-[#22c55e] font-bold">None (Audit Log Signed)</span>}
+                  {activePhase === 4 && <span className="text-amber-500 font-bold">Approve, Correct, Escalate, Defer</span>}
+                  {activePhase === 5 && <span className="text-[#22c55e] font-bold">None (Audit Trail Recorded)</span>}
                 </div>
               </div>
               <div>
@@ -213,13 +218,13 @@ export default function GuidedDemo() {
                     <>
                       <li>Approved Finding</li>
                       <li>Escalated Field Check</li>
-                      <li>Hold engaged</li>
+                      <li>Deferred / Dormant Pending New Evidence</li>
                     </>
                   )}
                   {activePhase === 5 && (
                     <>
-                      <li>Locked Report Preview</li>
-                      <li>Reopened by new photos</li>
+                      <li>Report Preview Available</li>
+                      <li>Reopened by New Field Evidence (Revalidation)</li>
                     </>
                   )}
                 </ul>
@@ -303,14 +308,14 @@ export default function GuidedDemo() {
                     <ul className="space-y-2 list-disc list-inside text-[#94a3b8]">
                       <li>Original evidence file identifiers and sequence keys generated.</li>
                       <li>Audit ledger initialized. No diagnostic recommendations generated yet.</li>
-                      <li>Original photographic metadata (EXIF GPS stamps, dates) saved.</li>
+                      <li>Original photographic metadata (Available file metadata, dates) saved.</li>
                       <li>Ledger integrity checklist verified (32/32 rules initialized).</li>
                     </ul>
                   )}
                   {activePhase === 2 && (
                     <ul className="space-y-2 list-disc list-inside text-[#94a3b8]">
                       <li>Photographs evaluated. Visual similarity grouped 96 images to 13 sequences.</li>
-                      <li>Asset candidate generated based on location coordinate boundaries.</li>
+                      <li>Asset candidate generated based on sequence-derived or inspector-provided context where present.</li>
                       <li>Mapped 8 unique assets. Duplicate files are linked under parent groups.</li>
                       <li>Audit trail updated with deduplication logs.</li>
                     </ul>
@@ -320,23 +325,23 @@ export default function GuidedDemo() {
                       <li>Condition findings generated by local analysis models.</li>
                       <li>Mechanical operating lifetimes checked. Cabinet corrosion logged for AHU-02.</li>
                       <li>Confidence gate triggered. Chiller nameplate serial key confidence falls below 75%.</li>
-                      <li>Automatic decision generation is **blocked**, routing exceptions to queue.</li>
+                      <li>Automatic decision generation is blocked, routing exceptions to queue.</li>
                     </ul>
                   )}
                   {activePhase === 4 && (
                     <ul className="space-y-2 list-disc list-inside text-[#94a3b8]">
-                      <li>Admissibility gate exception log created: **OCR serial low confidence (64%)**.</li>
+                      <li>Admissibility gate exception log created: OCR serial low confidence (64%).</li>
                       <li>Review package assembled, showing close-up photo reference.</li>
-                      <li>Operator inputs received: serial corrected to **CH-0915-B**.</li>
+                      <li>Operator inputs received: serial corrected to CH-0915-B.</li>
                       <li>Operator's manual sign-off recorded to the decision ledger.</li>
                     </ul>
                   )}
                   {activePhase === 5 && (
                     <ul className="space-y-2 list-disc list-inside text-[#94a3b8]">
                       <li>Recommendations linked to verified physical photographs.</li>
-                      <li>Chained decision ledger package finalized and sealed.</li>
+                      <li>Chained decision ledger package completed.</li>
                       <li>Dormant asset branches and revalidation check loops initialized.</li>
-                      <li>System transitions back to active transponder watch state.</li>
+                      <li>System transitions back to active monitoring state.</li>
                     </ul>
                   )}
                 </div>
@@ -372,15 +377,16 @@ export default function GuidedDemo() {
                 {/* EXPANDABLE DETAILS */}
                 <div className="pt-2 border-t border-[#334155]/20 shrink-0">
                   <details className="expandable-details" style={{ margin: 0 }}>
-                    <summary>View Decisional Registry Hash</summary>
+                    <summary>View Demonstration Record Details</summary>
                     <div className="raw-json-block text-left mt-2">
 {`{
   "phase_id": ${activePhase},
   "phase_label": "${phases[activePhase - 1].label}",
   "validation_tests_run": 32,
   "validation_status": "${activePhase === 4 ? 'GATE_HOLD' : 'PASS'}",
-  "demo_ledger_hash": "0x8f2d512b${activePhase * 1010}b9c",
-  "active_revalidation_check": ${activePhase === 5 ? 'true' : 'false'}
+  "demo_ledger_hash": "0x8f2d512b${activePhase * 1010}b9c (Demo Placeholder)",
+  "active_revalidation_check": ${activePhase === 5 ? 'true' : 'false'},
+  "demo_placeholder_notice": "This is a demonstration mockup record."
 }`}
                     </div>
                   </details>
@@ -395,38 +401,36 @@ export default function GuidedDemo() {
               Persistent Audit Rail (Timeline)
             </div>
 
-            {/* Audit Rail timeline bar */}
-            <div className="overflow-x-auto pb-1">
-              <div className="flex gap-4 min-w-[640px] relative font-mono text-[9px]">
-                {auditRailMilestones.map((milestone) => {
-                  const isCurrent = milestone.phase === activePhase;
-                  const isPassed = milestone.phase < activePhase;
-                  
-                  let borderStyle = 'border-[#334155] bg-[#0b0f19] text-[#64748b]';
-                  if (isCurrent) {
-                    borderStyle = 'border-[#38bdf8] bg-[#38bdf8]/10 text-white font-bold';
-                  } else if (isPassed) {
-                    borderStyle = 'border-[#334155] bg-[#1e293b]/30 text-[#94a3b8]';
-                  }
+            {/* Audit Rail responsive wrapping grid */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-2 font-mono text-[9px]">
+              {auditRailMilestones.map((milestone) => {
+                const isCurrent = milestone.phase === activePhase;
+                const isPassed = milestone.phase < activePhase;
+                
+                let borderStyle = 'border-[#334155] bg-[#0b0f19] text-[#64748b]';
+                if (isCurrent) {
+                  borderStyle = 'border-[#38bdf8] bg-[#38bdf8]/10 text-white font-bold';
+                } else if (isPassed) {
+                  borderStyle = 'border-[#334155] bg-[#1e293b]/30 text-[#94a3b8]';
+                }
 
-                  return (
-                    <div 
-                      key={milestone.id} 
-                      className={`flex-1 p-2 rounded border leading-tight flex flex-col justify-between ${borderStyle}`}
-                    >
-                      <div>
-                        <div className="text-[#64748b] uppercase scale-90 origin-left">
-                          LOG {milestone.id}
-                        </div>
-                        <div className="mt-1 font-semibold">{milestone.text}</div>
+                return (
+                  <div 
+                    key={milestone.id} 
+                    className={`p-2 rounded border leading-tight flex flex-col justify-between ${borderStyle}`}
+                  >
+                    <div>
+                      <div className="text-[#64748b] uppercase scale-90 origin-left">
+                        LOG {milestone.id}
                       </div>
-                      <div className="text-[8px] text-[#64748b] mt-2 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
-                        {milestone.mockVal}
-                      </div>
+                      <div className="mt-1 font-semibold">{milestone.text}</div>
                     </div>
-                  );
-                })}
-              </div>
+                    <div className="text-[8px] text-[#64748b] mt-2 font-sans overflow-hidden text-ellipsis whitespace-nowrap">
+                      {milestone.mockVal}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
             
             <div className="text-[8px] text-[#64748b] font-mono">
