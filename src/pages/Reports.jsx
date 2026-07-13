@@ -56,25 +56,38 @@ export default function Reports() {
         return `==========================================================
 RAVENFORGE SYSTEMS - EXECUTIVE SUMMARY REPORT (SIMULATED)
 ==========================================================
-PROJECT BASELINE: Facility Condition Assessment
+REPORT TITLE: Executive Condition Summary
+ASSESSMENT NAME: Building A Pilot Condition Assessment
+RECORD DATE: July 12, 2026
+INTENDED AUDIENCE: Facilities Managers, Compliance Officers
+SOURCE EVIDENCE: Mapped to 96 ingested field photographs (SEQ-001 through SEQ-013)
+SIMULATED NOTICE: This is a simulated demonstration report. All data, counts, locations, and costs are synthetic. No physical certifications or compliance claims are implied.
+----------------------------------------------------------
 TOTAL IDENTIFIED ASSETS: 8 Unique Units
 HEALTH INTEGRITY SUMMARY:
 - 5 Assets in Good/Fair condition (Routine monitoring)
 - 2 Assets flagged with structural anomalies (Action Required)
 - 1 Asset in Critical failure (Coolant leak active)
 
-CAPITAL EXPENDITURE ESTIMATE (MOCK):
+CAPITAL EXPENDITURE ESTIMATE (SIMULATED MOCK):
 - Priority 1 (Immediate replacements): $12,500
 - Priority 2 (12-24 month lifecycle):  $24,000
 - Priority 3 (Routine Maintenance):     $6,400
 
-VERIFICATION METRIC: 32/32 Policy Rules Verified.
-QC OVERRIDES LOGGED: 2 manual entries signed off.
+VERIFICATION METRIC: 32/32 Simulated Policy Rules Checked
+QC OVERRIDES LOGGED: 2 manual entries signed off in active session
 ==========================================================`;
       case 'REP-002':
         return `==========================================================
 RAVENFORGE SYSTEMS - ASSET REGISTER LEDGER (SIMULATED)
 ==========================================================
+REPORT TITLE: Asset Registry Inventory Ledger
+ASSESSMENT NAME: Building A Pilot Condition Assessment
+RECORD DATE: July 12, 2026
+INTENDED AUDIENCE: Program Managers, Maintenance Planners
+SOURCE EVIDENCE: Mapped to 96 ingested field photographs (SEQ-001 through SEQ-013)
+SIMULATED NOTICE: This is a simulated demonstration report. All data, counts, locations, and costs are synthetic. No physical certifications or compliance claims are implied.
+----------------------------------------------------------
 ASSET_ID    NAME       LOCATION                       CONDITION
 ----------------------------------------------------------
 AHU-01      AHU 01     Bldg A, Mech Room 104          Good
@@ -86,12 +99,19 @@ CHILLER-02  Chiller 02 Bldg B, Rooftop Deck           Fair
 FIRE-EXT-01 Ext 01     Bldg B, Corridor 201           Critical
 FIRE-EXT-02 Ext 02     Bldg B, Lobby Entrance         Good
 
-* Ledger entries bound with tamper-evident audit history records.
+* Simulated ledger entries bound with synthetic audit trail records.
 ==========================================================`;
       case 'REP-003':
         return `==========================================================
 RAVENFORGE SYSTEMS - PRIORITY FINDINGS DRILLDOWN (SIMULATED)
 ==========================================================
+REPORT TITLE: Critical and Poor Condition Findings Drilldown
+ASSESSMENT NAME: Building A Pilot Condition Assessment
+RECORD DATE: July 12, 2026
+INTENDED AUDIENCE: Risk Management Officers, Engineering Teams
+SOURCE EVIDENCE: Mapped to 96 ingested field photographs (SEQ-001 through SEQ-013)
+SIMULATED NOTICE: This is a simulated demonstration report. All data, counts, locations, and costs are synthetic. No physical certifications or compliance claims are implied.
+----------------------------------------------------------
 FINDING ID: FIND-001
 ASSET: AHU 02
 LOCATION: Building A, Mechanical Room 104
@@ -114,11 +134,16 @@ RECOMMENDATION: Re-tag & re-charge pressure cylinder immediately.
         return `==========================================================
 RAVENFORGE SYSTEMS - MOCK COMPLIANCE PACKAGE
 ==========================================================
-SYSTEM STATUS: Nominally Validated
-EVIDENCE TRACEABILITY: Verified
-AUDIT REGISTER CHAIN: 0x8f2d512bd4588b9c...
-
-This document represents simulated data compiled during scenario runs.
+REPORT TITLE: Simulated Verification Records Checklist
+ASSESSMENT NAME: Building A Pilot Condition Assessment
+RECORD DATE: July 12, 2026
+INTENDED AUDIENCE: Compliance Officers, Auditors
+SOURCE EVIDENCE: Mapped to 96 ingested field photographs (SEQ-001 through SEQ-013)
+SIMULATED NOTICE: This is a simulated demonstration report. All data, counts, locations, and costs are synthetic. No physical certifications or compliance claims are implied.
+----------------------------------------------------------
+SYSTEM STATUS: Nominally Validated (Simulated Run)
+EVIDENCE TRACEABILITY: Verified (Synthetic Check)
+AUDIT REGISTER CHAIN: 0x8f2d512bd4588b9c... (Mock Hash)
 ==========================================================`;
     }
   };

@@ -35,16 +35,16 @@ export default function GuidedDemo() {
 
   // Audit milestones with realistic simulated values (no placeholder tags)
   const auditRailMilestones = [
-    { id: 1, text: 'Evidence received', phase: 1, val: '96 photos, EXIF metadata, camera logs' },
-    { id: 2, text: 'Evidence appended', phase: 1, val: 'Audit Record Block: 0x8f2d-96a4' },
-    { id: 3, text: 'Context recorded', phase: 1, val: 'Inspection timestamps: 2026-07-12' },
-    { id: 4, text: 'Asset candidate recorded', phase: 2, val: '8 unique asset profiles registered' },
-    { id: 5, text: 'Finding recorded', phase: 3, val: '3 condition anomalies flagged' },
-    { id: 6, text: 'Gate result recorded', phase: 3, val: 'Review Block: Chiller Nameplate OCR 64%' },
-    { id: 7, text: 'Human review requested', phase: 4, val: 'Escalation active: Review REV-001' },
-    { id: 8, text: 'Human decision recorded', phase: 4, val: 'Operator verified serial: CH-0915-B' },
-    { id: 9, text: 'Recommendation recorded', phase: 5, val: 'Asset recommendation: AHU-02 inspection' },
-    { id: 10, text: 'Revalidation trigger retained', phase: 5, val: 'Revalidation decay tracking activated' }
+    { id: 1, text: 'Evidence received', phase: 1, val: '96 photos, Simulated EXIF and camera metadata' },
+    { id: 2, text: 'Evidence appended', phase: 1, val: 'Simulated Audit Block: 0x8f2d-96a4' },
+    { id: 3, text: 'Context recorded', phase: 1, val: 'Simulated time logs: 2026-07-12' },
+    { id: 4, text: 'Asset candidate recorded', phase: 2, val: '8 unique simulated asset profiles' },
+    { id: 5, text: 'Finding recorded', phase: 3, val: '3 simulated condition anomalies' },
+    { id: 6, text: 'Gate result recorded', phase: 3, val: 'Simulated Review Block: Chiller OCR 64%' },
+    { id: 7, text: 'Human review requested', phase: 4, val: 'Simulated review task REV-001' },
+    { id: 8, text: 'Human decision recorded', phase: 4, val: 'Operator verified simulated serial CH-0915-B' },
+    { id: 9, text: 'Recommendation recorded', phase: 5, val: 'Simulated planning recommendation AHU-02' },
+    { id: 10, text: 'Revalidation trigger retained', phase: 5, val: 'Simulated decay monitoring activated' }
   ];
 
   const handleNext = () => {

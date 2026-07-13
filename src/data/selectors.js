@@ -73,3 +73,71 @@ export function getAssessmentStatus(assets = assetsList, reviews = reviewQueueLi
 export function getRecentActivity(timeline = auditTimelineList) {
   return timeline.slice().reverse(); // Show newest events first
 }
+
+/**
+ * Shared evaluation engine for asset decision rules (risk, review, action, status).
+ */
+export function evaluateAssetRules(inputs) {
+  const rulesTriggered = [];
+  let riskLevel = 'Low';
+  let reviewRequired = 'No';
+  let decisionStatus = 'Passed checks';
+  let actionRecommended = 'Routine maintenance schedule';
+
+  // 1. Criticality and Condition Checks
+  if (inputs.condition === 'Critical') {
+    rulesTriggered.push('Critical Condition Threshold Exceeded');
+    riskLevel = 'High';
+    actionRecommended = 'Immediate dispatch of engineering team';
+    decisionStatus = 'Exception Review Pending';
+    reviewRequired = 'Yes';
+  } else if (inputs.condition === 'Poor') {
+    rulesTriggered.push('Poor Condition Advisory');
+    riskLevel = 'Medium';
+    actionRecommended = 'Schedule repair check within 14 days';
+  }
+
+  // 2. Safety Criticality rules
+  if (inputs.criticality === 'Mission Critical / Life Safety') {
+    rulesTriggered.push('Life-Safety Enforced Policy');
+    if (inputs.condition === 'Poor' || inputs.condition === 'Critical') {
+      riskLevel = 'High';
+      reviewRequired = 'Yes';
+      decisionStatus = 'Exception Review Pending';
+      actionRecommended = 'Priority replacement cost estimate required';
+    }
+  }
+
+  // 3. Admissibility and Confidence Checks
+  const confidenceLimit = inputs.criticality === 'Mission Critical / Life Safety' ? 90 : 75;
+  if (inputs.confidence < confidenceLimit) {
+    rulesTriggered.push(`Low-Confidence Flag (Below ${confidenceLimit}% limit)`);
+    reviewRequired = 'Yes';
+    decisionStatus = 'Exception Review Pending';
+    actionRecommended = 'Halt automated process; route to manual reviews';
+  }
+
+  // 4. Evidence completeness
+  if (inputs.evidenceCompleteness === 'Incomplete/Indeterminate Metadata') {
+    rulesTriggered.push('Evidence Completeness Audit Warning');
+    if (inputs.confidence < 80) {
+      reviewRequired = 'Yes';
+      decisionStatus = 'Exception Review Pending';
+    }
+  }
+
+  // Final clean states
+  if (rulesTriggered.length === 0) {
+    decisionStatus = 'Passed checks';
+    actionRecommended = 'Routine monitoring check set';
+  }
+
+  return {
+    riskLevel,
+    reviewRequired,
+    decisionStatus,
+    rulesTriggered,
+    actionRecommended
+  };
+}
+

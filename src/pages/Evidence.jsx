@@ -43,7 +43,7 @@ export default function Evidence() {
               Source Evidence Ingest
             </h1>
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-              Photographs, location logs, and metadata records mapped to assets.
+              Simulated photographs, location logs, and metadata records mapped to assets. All metadata and EXIF labels represent simulated demonstration data.
             </p>
           </div>
           <div>
@@ -66,7 +66,7 @@ export default function Evidence() {
         </div>
         <div className="card" style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '28px', fontWeight: 600, color: 'var(--color-green)', fontFamily: 'var(--font-mono)' }}>13 / 13</div>
-          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 500, marginTop: '4px' }}>Location Records Verified</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 500, marginTop: '4px' }}>Simulated Locations Verified</div>
         </div>
         <div className="card" style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '28px', fontWeight: 600, color: '#fff', fontFamily: 'var(--font-mono)' }}>100%</div>
@@ -79,7 +79,7 @@ export default function Evidence() {
         <div>
           <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#fff' }}>Consolidated Photo Sequences</h2>
           <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-            The 96 raw inspection images are grouped into 13 coherent sequences based on time and location metadata.
+            The 96 raw inspection images are grouped into 13 coherent sequences based on simulated time and location metadata.
           </p>
         </div>
 
@@ -169,7 +169,7 @@ export default function Evidence() {
                   <tr>
                     <th>FILE NAME</th>
                     <th>ASSET MAPPING</th>
-                    <th>COORDINATE REFERENCE</th>
+                    <th>SIMULATED COORDINATES</th>
                     <th>STATUS</th>
                     <th>CONFIDENCE</th>
                     <th>AUDIT HASH</th>
@@ -202,7 +202,7 @@ export default function Evidence() {
             </div>
             
             <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-              * The evidence ledger displays original file structures, hashes, and validation stamps for all {evidenceLedger.length} ingested frames.
+              * Note: The evidence ledger displays simulated file structures, synthetic hashes, and validation stamps for demonstration purposes only.
             </div>
           </div>
         </details>

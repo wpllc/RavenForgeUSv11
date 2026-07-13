@@ -107,8 +107,11 @@ export default function ReviewQueue() {
           {resolvedItems.length > 0 && (
             <section className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#fff', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px' }}>
-                Resolved Decisions (Active Session)
+                Resolved Decisions (Demonstration-Session Behavior — Non-Persistent)
               </h3>
+              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '-8px' }}>
+                Note: Decision overrides and logs are cached temporarily in local browser memory. They do not persist across users or reload sessions.
+              </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {resolvedItems.map(item => (
                   <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-primary)', padding: '12px 16px', borderRadius: '6px', border: '1px solid var(--border-color)', flexWrap: 'wrap', gap: '12px' }}>
@@ -117,7 +120,7 @@ export default function ReviewQueue() {
                       <h4 style={{ fontSize: '13px', fontWeight: 600, color: '#fff', marginTop: '2px' }}>{item.title}</h4>
                       <p style={{ fontSize: '12px', color: 'var(--color-green)', fontWeight: 500, marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                         <CheckCircle size={12} />
-                        {item.operatorNotes}
+                        {item.operatorNotes} (Demo Log)
                       </p>
                     </div>
                     <button 
@@ -125,7 +128,7 @@ export default function ReviewQueue() {
                       className="btn btn-secondary text-xs"
                       style={{ padding: '6px 12px' }}
                     >
-                      Reset Decision
+                      Reset Session State
                     </button>
                   </div>
                 ))}
