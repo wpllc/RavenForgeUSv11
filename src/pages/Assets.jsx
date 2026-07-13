@@ -23,7 +23,9 @@ export default function Assets() {
   // Selected asset state, pre-selecting if redirected from the dashboard or query parameter
   const queryAssetId = queryParams.get('selectedAssetId');
   const isValidAsset = assetsList.some(a => a.id === queryAssetId);
-  const initialAssetId = (queryAssetId && isValidAsset) ? queryAssetId : (location.state?.selectedAssetId || 'AHU-02');
+  const isStateAssetValid = location.state?.selectedAssetId && assetsList.some(a => a.id === location.state.selectedAssetId);
+  const fallbackAssetId = isStateAssetValid ? location.state.selectedAssetId : 'AHU-02';
+  const initialAssetId = (queryAssetId && isValidAsset) ? queryAssetId : fallbackAssetId;
   const [selectedAssetId, setSelectedAssetId] = useState(initialAssetId);
   const detailPanelHeadingRef = useRef(null);
 
@@ -35,7 +37,7 @@ export default function Assets() {
     
     if (qAsset && assetsList.some(a => a.id === qAsset)) {
       setSelectedAssetId(qAsset);
-    } else if (location.state?.selectedAssetId) {
+    } else if (location.state?.selectedAssetId && assetsList.some(a => a.id === location.state.selectedAssetId)) {
       setSelectedAssetId(location.state.selectedAssetId);
     }
     

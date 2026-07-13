@@ -1,23 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { BookOpen, FileText, Download, Eye, X, AlertCircle } from 'lucide-react';
 import { reportsList, projectSummary } from '../data/demoData';
 
 export default function Reports() {
-  // Visual QA Query Synchronizer Utility — Demonstration and QA Only
-  const [previewReportId, setPreviewReportId] = useState(() => {
-    const qId = new URLSearchParams(window.location.search).get('previewReportId');
-    const isValid = reportsList.some(r => r.id === qId);
-    return isValid ? qId : null;
-  });
+  const location = useLocation();
   const closeButtonRef = useRef(null);
   const triggerRef = useRef(null);
 
+  // Visual QA Query Synchronizer Utility — Demonstration and QA Only
+  const [previewReportId, setPreviewReportId] = useState(() => {
+    const qId = new URLSearchParams(location.search).get('previewReportId');
+    const isValid = reportsList.some(r => r.id === qId);
+    return isValid ? qId : null;
+  });
+
   // Sync state if query parameters change (Demonstration Utility)
   useEffect(() => {
-    const qId = new URLSearchParams(window.location.search).get('previewReportId');
+    const qId = new URLSearchParams(location.search).get('previewReportId');
     const isValid = reportsList.some(r => r.id === qId);
     setPreviewReportId(isValid ? qId : null);
-  }, [window.location.search]);
+  }, [location.search]);
 
   const handleDownload = (report) => {
     const text = getMockReportContent(report.id);
