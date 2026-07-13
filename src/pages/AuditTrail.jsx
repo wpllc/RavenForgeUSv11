@@ -90,7 +90,7 @@ export default function AuditTrail() {
   "timestamp": "2026-07-12T${event.timestamp}Z",
   "actor_node": "${event.actor}",
   "event_directive": "${event.action.toUpperCase()}",
-  "evidence_payload_fingerprint": "0x8f2d512b${idx * 1111}b9c (Demo Placeholder)",
+  "evidence_payload_fingerprint": "0x8f2d512b${idx * 1111}b9c (Simulated fingerprint)",
   "tamper_evident_signatures": {
     "validation_pass": true,
     "block_signature": "SHA256_RSA_MOCK_${event.timestamp.replace(/:/g, '')}"

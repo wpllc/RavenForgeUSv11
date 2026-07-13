@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HUDLayout from './components/HUDLayout';
-import AuthGate from './components/AuthGate';
 
 // Import public demonstration pages
 import Overview from './pages/Overview';
@@ -34,15 +33,8 @@ export default function App() {
           <Route path="/audit-trail" element={<AuditTrail />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           
-          {/* Gated Simulator route - wrapped exclusively by AuthGate */}
-          <Route 
-            path="/simulator" 
-            element={
-              <AuthGate>
-                <Simulator />
-              </AuthGate>
-            } 
-          />
+          {/* Policy Test Lab (Simulator) route - open access */}
+          <Route path="/simulator" element={<Simulator />} />
           
           {/* Redirect rules to support compatibility for old ASP routes */}
           <Route path="/Overview.asp" element={<Navigate to="/overview" replace />} />

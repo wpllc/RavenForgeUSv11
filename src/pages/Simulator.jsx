@@ -1,136 +1,453 @@
 import React, { useState, useEffect } from 'react';
-import RadarScanner from '../components/RadarScanner';
-import { Shield, Eye, Database, Terminal, ShieldAlert, Cpu } from 'lucide-react';
+import { Shield, Play, HelpCircle, FileText, CheckCircle, AlertTriangle, RefreshCw } from 'lucide-react';
 
 export default function Simulator() {
-  const [packetRate, setPacketRate] = useState(4.25);
+  // Preset scenarios definitions
+  const scenarios = {
+    ocr_mismatch: {
+      name: 'Scenario 1: Low-Confidence Chiller OCR',
+      assetType: 'Chiller',
+      condition: 'Fair',
+      confidence: 64,
+      criticality: 'Standard Facility',
+      evidenceCompleteness: 'Incomplete/Indeterminate Metadata',
+      description: 'Chiller nameplate serial key OCR confidence falls below the 75% standard admissibility threshold.'
+    },
+    expired_tag: {
+      name: 'Scenario 2: Fire Extinguisher Expired Tag',
+      assetType: 'Fire Extinguisher',
+      condition: 'Poor',
+      confidence: 99,
+      criticality: 'Mission Critical / Life Safety',
+      evidenceCompleteness: 'Complete Photo Set',
+      description: 'Extinguisher tag exceeds the 12-month boundary safety rules checked in the database.'
+    },
+    fluid_leak: {
+      name: 'Scenario 3: Active Fluid Leak',
+      assetType: 'Pump',
+      condition: 'Critical',
+      confidence: 88,
+      criticality: 'Mission Critical / Life Safety',
+      evidenceCompleteness: 'Complete Photo Set',
+      description: 'A pump seal has failed with active moisture staining, triggering critical response rules.'
+    },
+    end_of_life: {
+      name: 'Scenario 4: AHU Near End of Life Cycle',
+      assetType: 'AHU',
+      condition: 'Poor',
+      confidence: 92,
+      criticality: 'Standard Facility',
+      evidenceCompleteness: 'Complete Photo Set',
+      description: 'AHU operating lifetime exceeds 15-year lifecycle parameters.'
+    },
+    nominal: {
+      name: 'Scenario 5: Nominal Check',
+      assetType: 'AHU',
+      condition: 'Good',
+      confidence: 98,
+      criticality: 'Standard Facility',
+      evidenceCompleteness: 'Complete Photo Set',
+      description: 'Nominal operational status with full evidence logs.'
+    }
+  };
 
+  const [activeScenarioKey, setActiveScenarioKey] = useState('ocr_mismatch');
+  
+  // Simulation parameters
+  const [assetType, setAssetType] = useState('Chiller');
+  const [condition, setCondition] = useState('Fair');
+  const [confidence, setConfidence] = useState(64);
+  const [criticality, setCriticality] = useState('Standard Facility');
+  const [evidenceCompleteness, setEvidenceCompleteness] = useState('Incomplete/Indeterminate Metadata');
+
+  // Sync state when active scenario changes
   useEffect(() => {
-    const interval = setInterval(() => {
-      setPacketRate((prev) => +(prev + (Math.random() - 0.5) * 0.15).toFixed(2));
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
+    const sc = scenarios[activeScenarioKey];
+    if (sc) {
+      setAssetType(sc.assetType);
+      setCondition(sc.condition);
+      setConfidence(sc.confidence);
+      setCriticality(sc.criticality);
+      setEvidenceCompleteness(sc.evidenceCompleteness);
+    }
+  }, [activeScenarioKey]);
+
+  // Evaluates safety rules based on parameters
+  const runEvaluation = (inputs) => {
+    const rulesTriggered = [];
+    let riskLevel = 'Low';
+    let reviewRequired = 'No';
+    let decisionStatus = 'Passed checks';
+    let actionRecommended = 'Routine maintenance schedule';
+
+    // 1. Criticality and Condition Checks
+    if (inputs.condition === 'Critical') {
+      rulesTriggered.push('Critical Condition Threshold Exceeded');
+      riskLevel = 'High';
+      actionRecommended = 'Immediate dispatch of engineering team';
+      decisionStatus = 'Exception Review Pending';
+      reviewRequired = 'Yes';
+    } else if (inputs.condition === 'Poor') {
+      rulesTriggered.push('Poor Condition Advisory');
+      riskLevel = 'Medium';
+      actionRecommended = 'Schedule repair check within 14 days';
+    }
+
+    // 2. Safety Criticality rules
+    if (inputs.criticality === 'Mission Critical / Life Safety') {
+      rulesTriggered.push('Life-Safety Enforced Policy');
+      if (inputs.condition === 'Poor' || inputs.condition === 'Critical') {
+        riskLevel = 'High';
+        reviewRequired = 'Yes';
+        decisionStatus = 'Exception Review Pending';
+        actionRecommended = 'Priority replacement cost estimate required';
+      }
+    }
+
+    // 3. Admissibility and Confidence Checks
+    const confidenceLimit = inputs.criticality === 'Mission Critical / Life Safety' ? 90 : 75;
+    if (inputs.confidence < confidenceLimit) {
+      rulesTriggered.push(`Low-Confidence Flag (Below ${confidenceLimit}% limit)`);
+      reviewRequired = 'Yes';
+      decisionStatus = 'Exception Review Pending';
+      actionRecommended = 'Halt automated process; route to manual reviews';
+    }
+
+    // 4. Evidence completeness
+    if (inputs.evidenceCompleteness === 'Incomplete/Indeterminate Metadata') {
+      rulesTriggered.push('Evidence Completeness Audit Warning');
+      if (inputs.confidence < 80) {
+        reviewRequired = 'Yes';
+        decisionStatus = 'Exception Review Pending';
+      }
+    }
+
+    // Final clean states
+    if (rulesTriggered.length === 0) {
+      decisionStatus = 'Passed checks';
+      actionRecommended = 'Routine monitoring check set';
+    }
+
+    return {
+      riskLevel,
+      reviewRequired,
+      decisionStatus,
+      rulesTriggered,
+      actionRecommended
+    };
+  };
+
+  // Run evaluations
+  const baselineScenario = scenarios[activeScenarioKey];
+  const beforeResult = runEvaluation({
+    assetType: baselineScenario.assetType,
+    condition: baselineScenario.condition,
+    confidence: baselineScenario.confidence,
+    criticality: baselineScenario.criticality,
+    evidenceCompleteness: baselineScenario.evidenceCompleteness
+  });
+
+  const afterResult = runEvaluation({
+    assetType,
+    condition,
+    confidence,
+    criticality,
+    evidenceCompleteness
+  });
+
+  // Calculate plain-English explanation
+  const getExplanation = () => {
+    const baselineText = baselineScenario.name;
+    let text = `Currently testing adjustments against the baseline configuration of "${baselineText}". `;
+    
+    if (criticality !== baselineScenario.criticality && criticality === 'Mission Critical / Life Safety') {
+      text += 'Upgrading the asset to Mission Critical status enforces a higher confidence threshold (90% instead of 75%), which triggers validation exception gates. ';
+    }
+    if (confidence !== baselineScenario.confidence && confidence < baselineScenario.confidence) {
+      text += `Lowering the OCR confidence to ${confidence}% violated admissibility thresholds, shifting the decision status to manual verification. `;
+    }
+    if (condition !== baselineScenario.condition) {
+      text += `Modifying the condition health to "${condition}" changed the recommended planning action directly to "${afterResult.actionRecommended}". `;
+    }
+    if (afterResult.decisionStatus !== beforeResult.decisionStatus) {
+      text += `This adjustment moved the decision status from "${beforeResult.decisionStatus}" to "${afterResult.decisionStatus}".`;
+    } else {
+      text += 'The changes did not alter the macro-level decision status, but updated the specific triggered rules.';
+    }
+    return text;
+  };
 
   return (
-    <div className="simulator-theme">
-      {/* 1024x768 Inner Box for Simulator (Optional, scrollable) */}
-      <div className="hud-crt-screen" style={{ minHeight: '600px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <div className="hud-scanlines"></div>
-        <div className="hud-grid-matrix" style={{ opacity: 0.15 }}></div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      
+      {/* HEADER */}
+      <section className="card" style={{ padding: '20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+          <div>
+            <h1 style={{ fontSize: '28px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Shield size={24} className="text-[#38bdf8]" aria-hidden="true" />
+              Decision Scenario Simulator
+            </h1>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+              Simulate decision rules, confidence ratings, and safety thresholds to test how RavenForge handles asset validation scenarios.
+            </p>
+          </div>
+        </div>
+      </section>
 
-        {/* 1. WELCOME COMMAND MODULE */}
-        <div className="hud-panel corners" style={{ padding: '20px', background: 'rgba(0, 243, 255, 0.02)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px', zIndex: 10 }}>
-          <div className="corners-inner"></div>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span className="pulse-indicator indicator-green"></span>
-              <span className="tech-font" style={{ fontSize: '0.75rem', color: 'var(--color-cyan-sim)' }}>SECURE NETWORK ONLINE</span>
-            </div>
-            <h2 className="tech-font" style={{ fontSize: '1.4rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-              TACTICAL COMMAND DASHBOARD
+      {/* CORE INPUT GRID */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+        
+        {/* Left Column: Preset Selector and Custom Controls */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div>
+            <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#fff', marginBottom: '8px' }}>
+              1. Choose Scenario Baseline
             </h2>
-            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-dim-sim)', maxWidth: '600px', lineHeight: '1.4' }}>
-              Advanced Aerospace Telemetry Cockpit. This gated console tracks target vectors, transponder logs, and bio-cryptographic status metrics.
+            <select
+              value={activeScenarioKey}
+              onChange={(e) => setActiveScenarioKey(e.target.value)}
+              className="text-input"
+              style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '6px', color: '#fff', cursor: 'pointer' }}
+              aria-label="Select Scenario Baseline"
+            >
+              {Object.keys(scenarios).map(key => (
+                <option key={key} value={key}>{scenarios[key].name}</option>
+              ))}
+            </select>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '6px', lineHeight: '1.4' }}>
+              Baseline: {scenarios[activeScenarioKey].description}
             </p>
           </div>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <div className="hud-panel" style={{ padding: '10px 15px', background: 'rgba(0,0,0,0.4)', borderRadius: '2px', textAlign: 'center' }}>
-              <div className="tech-font" style={{ fontSize: '0.65rem', color: 'var(--color-text-dark-sim)' }}>THREAT RATE</div>
-              <div className="tech-font" style={{ fontSize: '1rem', fontWeight: 'bold', color: 'var(--color-cyan-sim)' }}>{packetRate} Hz</div>
+          <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#fff' }}>
+              2. Adjust Simulation Inputs
+            </h2>
+
+            {/* Asset Type */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <label style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'bold', textTransform: 'uppercase' }}>Asset Type</label>
+              <select
+                value={assetType}
+                onChange={(e) => setAssetType(e.target.value)}
+                className="text-input"
+                style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', color: '#fff' }}
+              >
+                <option value="Chiller">Chiller</option>
+                <option value="Pump">Pump</option>
+                <option value="AHU">AHU</option>
+                <option value="Fire Extinguisher">Fire Extinguisher</option>
+              </select>
             </div>
-            <div className="hud-panel accent-amber" style={{ padding: '10px 15px', background: 'rgba(0,0,0,0.4)', borderRadius: '2px', textAlign: 'center' }}>
-              <div className="tech-font" style={{ fontSize: '0.65rem', color: 'var(--color-text-dark-sim)' }}>THREAT STATUS</div>
-              <div className="tech-font" style={{ fontSize: '1rem', fontWeight: 'bold', color: 'var(--color-amber-sim)' }}>DEFCON 3</div>
+
+            {/* Condition Severity */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <label style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'bold', textTransform: 'uppercase' }}>Condition Health</label>
+              <select
+                value={condition}
+                onChange={(e) => setCondition(e.target.value)}
+                className="text-input"
+                style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', color: '#fff' }}
+              >
+                <option value="Good">Good (Nominal)</option>
+                <option value="Fair">Fair (Monitor)</option>
+                <option value="Poor">Poor (Action Required)</option>
+                <option value="Critical">Critical (Immediate Hazard)</option>
+              </select>
             </div>
+
+            {/* Confidence Slider */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'bold' }}>
+                <span>CONFIDENCE INDEX</span>
+                <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-brand-light)' }}>{confidence}%</span>
+              </div>
+              <input 
+                type="range" 
+                min="0" 
+                max="100" 
+                value={confidence}
+                onChange={(e) => setConfidence(parseInt(e.target.value))}
+                style={{ width: '100%', accentColor: 'var(--color-brand-light)', cursor: 'pointer' }}
+                aria-label="Confidence Rating"
+              />
+            </div>
+
+            {/* Safety Criticality */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <label style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'bold', textTransform: 'uppercase' }}>Safety Criticality</label>
+              <select
+                value={criticality}
+                onChange={(e) => setCriticality(e.target.value)}
+                className="text-input"
+                style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', color: '#fff' }}
+              >
+                <option value="Standard Facility">Standard Facility Asset</option>
+                <option value="Mission Critical / Life Safety">Mission Critical / Life Safety</option>
+              </select>
+            </div>
+
+            {/* Evidence Completeness */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <label style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'bold', textTransform: 'uppercase' }}>Evidence Metadata Completeness</label>
+              <select
+                value={evidenceCompleteness}
+                onChange={(e) => setEvidenceCompleteness(e.target.value)}
+                className="text-input"
+                style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', color: '#fff' }}
+              >
+                <option value="Complete Photo Set">Complete Photo Set & Logs</option>
+                <option value="Incomplete/Indeterminate Metadata">Indeterminate/Missing Metadata</option>
+              </select>
+            </div>
+
           </div>
         </div>
 
-        {/* 2. RADAR VIEWPORTS */}
-        <div style={{ zIndex: 10 }}>
-          <RadarScanner />
-        </div>
-
-        {/* 3. LOWER GRID DETAILS */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px', zIndex: 10 }}>
+        {/* Right Column: Comparative Outputs */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
-          {/* Bio-cryptographic Scanner HUD */}
-          <div className="hud-panel corners" style={{ padding: '20px', background: 'rgba(20, 25, 35, 0.5)' }}>
-            <div className="corners-inner"></div>
-            <h3 className="tech-font" style={{ fontSize: '0.9rem', color: 'var(--color-cyan-sim)', borderBottom: '1px solid rgba(0, 243, 255, 0.15)', paddingBottom: '8px', marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Eye size={16} />
-              BIOMETRICS SIGNATURE INTEGRITY
-            </h3>
-
-            <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-              {/* Hologram Scanner Reticle */}
-              <div style={{ 
-                width: '90px', 
-                height: '90px', 
-                border: '2px solid var(--color-cyan-sim)', 
-                boxShadow: 'var(--glow-cyan-sim)', 
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
-                background: 'rgba(0,243,255,0.03)',
-                overflow: 'hidden'
-              }}>
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '2px',
-                  background: 'var(--color-cyan-sim)',
-                  animation: 'scanline-scroll-sim 2s linear infinite'
-                }}></div>
-                <Shield size={36} style={{ color: 'var(--color-cyan-sim)' }} />
-              </div>
-
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px', fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>
-                <div>
-                  <span style={{ color: 'var(--color-text-dark-sim)' }}>OPERATOR:</span> <span style={{ color: '#fff', fontWeight: 'bold' }}>W. POLLITT</span>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--color-text-dark-sim)' }}>CLEARANCE:</span> <span style={{ color: 'var(--color-amber-sim)', fontWeight: 'bold' }}>LEVEL 5 (ULTRA)</span>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--color-text-dark-sim)' }}>AUTHENTICATION:</span> <span style={{ color: 'var(--color-green-sim)' }}>SECURED // MATCHED</span>
+          <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#fff' }}>
+              3. Comparative Outcomes
+            </h2>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              
+              {/* Baseline (Before) */}
+              <div style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '16px' }}>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 'bold', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+                  Scenario Baseline
+                </span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div>
+                    <span style={{ fontSize: '9px', color: 'var(--text-muted)', block: 'true' }}>DECISION STATUS</span>
+                    <span className={`badge ${beforeResult.decisionStatus === 'Passed checks' ? 'badge-green' : 'badge-amber'}`} style={{ display: 'block', marginTop: '2px', width: 'fit-content' }}>
+                      {beforeResult.decisionStatus}
+                    </span>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '9px', color: 'var(--text-muted)', block: 'true' }}>RISK LEVEL</span>
+                    <span className={`badge ${beforeResult.riskLevel === 'High' ? 'badge-red' : beforeResult.riskLevel === 'Medium' ? 'badge-amber' : 'badge-green'}`} style={{ display: 'block', marginTop: '2px', width: 'fit-content' }}>
+                      {beforeResult.riskLevel}
+                    </span>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '9px', color: 'var(--text-muted)', block: 'true' }}>HUMAN REVIEW REQUIRED</span>
+                    <span style={{ fontSize: '13px', fontWeight: 'bold', color: beforeResult.reviewRequired === 'Yes' ? 'var(--color-amber)' : '#fff', display: 'block', marginTop: '2px' }}>
+                      {beforeResult.reviewRequired}
+                    </span>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '9px', color: 'var(--text-muted)', block: 'true' }}>RECOMMENDED ACTION</span>
+                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px', lineHeight: '1.3' }}>
+                      {beforeResult.actionRecommended}
+                    </p>
+                  </div>
                 </div>
               </div>
+
+              {/* Active Simulation (After) */}
+              <div style={{ background: 'rgba(2, 132, 199, 0.03)', border: '1px solid var(--color-brand)', borderRadius: '6px', padding: '16px' }}>
+                <span style={{ fontSize: '10px', color: 'var(--color-brand-light)', fontWeight: 'bold', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+                  Active Simulation
+                </span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div>
+                    <span style={{ fontSize: '9px', color: 'var(--text-muted)', block: 'true' }}>DECISION STATUS</span>
+                    <span className={`badge ${afterResult.decisionStatus === 'Passed checks' ? 'badge-green' : 'badge-amber'}`} style={{ display: 'block', marginTop: '2px', width: 'fit-content' }}>
+                      {afterResult.decisionStatus}
+                    </span>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '9px', color: 'var(--text-muted)', block: 'true' }}>RISK LEVEL</span>
+                    <span className={`badge ${afterResult.riskLevel === 'High' ? 'badge-red' : afterResult.riskLevel === 'Medium' ? 'badge-amber' : 'badge-green'}`} style={{ display: 'block', marginTop: '2px', width: 'fit-content' }}>
+                      {afterResult.riskLevel}
+                    </span>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '9px', color: 'var(--text-muted)', block: 'true' }}>HUMAN REVIEW REQUIRED</span>
+                    <span style={{ fontSize: '13px', fontWeight: 'bold', color: afterResult.reviewRequired === 'Yes' ? 'var(--color-amber)' : '#fff', display: 'block', marginTop: '2px' }}>
+                      {afterResult.reviewRequired}
+                    </span>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '9px', color: 'var(--text-muted)', block: 'true' }}>RECOMMENDED ACTION</span>
+                    <p style={{ fontSize: '12px', color: '#fff', fontWeight: 500, marginTop: '2px', lineHeight: '1.3' }}>
+                      {afterResult.actionRecommended}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
-          {/* Warnings List */}
-          <div className="hud-panel corners accent-amber" style={{ padding: '20px', background: 'rgba(20, 25, 35, 0.5)' }}>
-            <div className="corners-inner"></div>
-            <h3 className="tech-font" style={{ fontSize: '0.9rem', color: 'var(--color-amber-sim)', borderBottom: '1px solid rgba(255, 159, 0, 0.15)', paddingBottom: '8px', marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Terminal size={16} />
-              COCKPIT ALERTS & THREAT LOGS
+          {/* Explanation Impact card */}
+          <div className="card" style={{ borderLeft: '4px solid var(--color-brand-light)', padding: '16px' }}>
+            <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#fff', marginBottom: '4px' }}>
+              Decisional Impact Explanation
             </h3>
-
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <span style={{ color: 'var(--color-red-sim)' }}>[CRIT]</span>
-                <span style={{ color: 'var(--color-text-dim-sim)' }}>Transponder lock lost in high-latitude corridor.</span>
-              </div>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <span style={{ color: 'var(--color-cyan-sim)' }}>[INFO]</span>
-                <span style={{ color: 'var(--color-text-dim-sim)' }}>Satellite tracking grid synchronized successfully.</span>
-              </div>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <span style={{ color: 'var(--color-amber-sim)' }}>[WARN]</span>
-                <span style={{ color: 'var(--color-text-dim-sim)' }}>Atmospheric radiation fluctuations detected.</span>
-              </div>
-            </div>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+              {getExplanation()}
+            </p>
           </div>
 
         </div>
+
       </div>
+
+      {/* D. LOGIC DETAILS AND LEDGER PREVIEW */}
+      <section className="card">
+        <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#fff', marginBottom: '12px' }}>
+          Simulated Admissibility Rules Checked
+        </h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px', fontSize: '12px' }}>
+          <div style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '12px' }}>
+            <strong style={{ color: '#fff', display: 'block', marginBottom: '4px' }}>Confidence Gate (Standard)</strong>
+            <span style={{ color: 'var(--text-secondary)' }}>Flags any serial scan, photograph matching sequence, or inspector tag reading below 75% confidence limit.</span>
+          </div>
+          <div style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '12px' }}>
+            <strong style={{ color: '#fff', display: 'block', marginBottom: '4px' }}>Life-Safety Criticality Rule</strong>
+            <span style={{ color: 'var(--text-secondary)' }}>Enforces a stricter 90% confidence threshold and blocks processing immediately on critical/poor conditions.</span>
+          </div>
+          <div style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '12px' }}>
+            <strong style={{ color: '#fff', display: 'block', marginBottom: '4px' }}>Completeness Policy check</strong>
+            <span style={{ color: 'var(--text-secondary)' }}>Triggers warnings if camera, location, or inspector timestamp metadata is missing or indeterminate.</span>
+          </div>
+        </div>
+
+        {/* Collapsible Decisional manifest */}
+        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '16px', marginTop: '16px' }}>
+          <details className="expandable-details" style={{ margin: 0 }}>
+            <summary>View Simulated Decision Record</summary>
+            <div className="raw-json-block mt-3 text-left">
+{`{
+  "simulation_run": {
+    "baseline_scenario": "${activeScenarioKey}",
+    "timestamp_est": "2026-07-12T16:34:12Z",
+    "inputs": {
+      "asset_type": "${assetType}",
+      "condition_health": "${condition}",
+      "confidence_score": ${confidence},
+      "enforced_criticality": "${criticality}",
+      "metadata_validation": "${evidenceCompleteness}"
+    },
+    "outputs": {
+      "risk_classification": "${afterResult.riskLevel}",
+      "manual_review_triggered": ${afterResult.reviewRequired === 'Yes' ? 'true' : 'false'},
+      "decision_status": "${afterResult.decisionStatus}",
+      "triggered_enforcements": ${JSON.stringify(afterResult.rulesTriggered)},
+      "recommended_action_actionable": "${afterResult.actionRecommended}"
+    }
+  }
+}`}
+            </div>
+          </details>
+        </div>
+      </section>
+
     </div>
   );
 }

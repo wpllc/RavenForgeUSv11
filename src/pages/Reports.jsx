@@ -7,6 +7,18 @@ export default function Reports() {
   const closeButtonRef = useRef(null);
   const triggerRef = useRef(null);
 
+  const handleDownload = (report) => {
+    const text = getMockReportContent(report.id);
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `RavenForge_Building_A_${report.name.replace(/\s+/g, '_')}_Report.txt`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const activePreviewReport = reportsList.find(r => r.id === previewReportId);
 
   // Handle modal backdrop clicks, Escape key, scroll locking, and focus restoration
@@ -146,7 +158,7 @@ This document represents simulated data compiled during scenario runs.
           Demonstration Output Deliverables
         </h2>
         <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-          The outputs listed below are mock files compiled from the sandbox dataset. Click <strong>Preview Sample</strong> to view the records. The file download links are disabled in this demo sandbox environment.
+          The outputs listed below are mock files compiled from the sandbox dataset. Click <strong>Preview</strong> to view the records inline, or click <strong>Download TXT</strong> to save the simulated report files directly to your device.
         </p>
       </section>
 
@@ -194,13 +206,13 @@ This document represents simulated data compiled during scenario runs.
                 </button>
                 
                 <button 
-                  disabled 
+                  onClick={() => handleDownload(report)}
                   className="btn text-xs"
-                  style={{ backgroundColor: 'var(--border-muted)', color: 'var(--text-muted)', cursor: 'not-allowed', padding: '6px 12px' }}
-                  title="No physical file available for download in this demo sandbox."
+                  style={{ padding: '6px 12px' }}
+                  aria-label={`Download ${report.name} as text file`}
                 >
                   <Download size={12} style={{ marginRight: '4px' }} />
-                  <span>Download Inactive</span>
+                  <span>Download TXT</span>
                 </button>
               </div>
             </div>

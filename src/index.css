@@ -106,18 +106,51 @@ html, body {
   gap: 8px;
 }
 
-/* Left Workspace Sidebar (Desktop Only) */
-.app-sidebar {
-  width: 260px;
+/* Desktop Horizontal Navigation Ribbon */
+.desktop-nav-ribbon {
+  display: none; /* Hidden on mobile */
   background-color: var(--bg-secondary);
-  border-right: 1px solid var(--border-color);
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-  overflow-y: auto;
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 1.5rem;
+  align-items: center;
+  gap: 0.75rem;
+  height: 48px;
+  overflow-x: auto;
+  scrollbar-width: none; /* Hide scrollbar for clean look */
 }
+.desktop-nav-ribbon::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .desktop-nav-ribbon {
+    display: flex !important;
+  }
+}
+
+.nav-ribbon-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  height: 100%;
+  padding: 0 0.5rem;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.nav-ribbon-link:hover {
+  color: #fff;
+}
+.nav-ribbon-link.active {
+  color: #fff;
+  font-weight: 600;
+  border-bottom-color: var(--color-brand-light);
+}
+
 
 .sidebar-group-title {
   font-size: 10px;
