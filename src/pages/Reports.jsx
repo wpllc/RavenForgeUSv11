@@ -3,16 +3,20 @@ import { BookOpen, FileText, Download, Eye, X, AlertCircle } from 'lucide-react'
 import { reportsList, projectSummary } from '../data/demoData';
 
 export default function Reports() {
+  // Visual QA Query Synchronizer Utility — Demonstration and QA Only
   const [previewReportId, setPreviewReportId] = useState(() => {
-    return new URLSearchParams(window.location.search).get('previewReportId');
+    const qId = new URLSearchParams(window.location.search).get('previewReportId');
+    const isValid = reportsList.some(r => r.id === qId);
+    return isValid ? qId : null;
   });
   const closeButtonRef = useRef(null);
   const triggerRef = useRef(null);
 
-  // Sync state if query parameters change
+  // Sync state if query parameters change (Demonstration Utility)
   useEffect(() => {
     const qId = new URLSearchParams(window.location.search).get('previewReportId');
-    setPreviewReportId(qId);
+    const isValid = reportsList.some(r => r.id === qId);
+    setPreviewReportId(isValid ? qId : null);
   }, [window.location.search]);
 
   const handleDownload = (report) => {
@@ -21,7 +25,7 @@ export default function Reports() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `RavenForge_Building_A_${report.name.replace(/\s+/g, '_')}_Report.txt`);
+    link.setAttribute('download', `RavenForge_Building_A_${report.name.replace(/\s+/g, '_')}.txt`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

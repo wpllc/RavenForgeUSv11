@@ -52,24 +52,29 @@ export default function Simulator() {
     }
   };
 
-  const [activeScenarioKey, setActiveScenarioKey] = useState('ocr_mismatch');
-  
-  // Simulation parameters
+  // Visual QA Query Synchronizer Utility — Demonstration and QA Only
+  const getValidatedParam = (key, allowedValues, defaultValue) => {
+    const val = new URLSearchParams(window.location.search).get(key);
+    return allowedValues.includes(val) ? val : defaultValue;
+  };
+
+  // Simulation parameters (Demonstration and QA Utilities)
   const [assetType, setAssetType] = useState(() => {
-    return new URLSearchParams(window.location.search).get('assetType') || 'Chiller';
+    return getValidatedParam('assetType', ['Chiller', 'Pump', 'AHU', 'Fire Extinguisher'], 'Chiller');
   });
   const [condition, setCondition] = useState(() => {
-    return new URLSearchParams(window.location.search).get('condition') || 'Fair';
+    return getValidatedParam('condition', ['Good', 'Fair', 'Poor', 'Critical'], 'Fair');
   });
   const [confidence, setConfidence] = useState(() => {
     const val = new URLSearchParams(window.location.search).get('confidence');
-    return val ? parseInt(val) : 64;
+    const parsed = parseInt(val);
+    return (!isNaN(parsed) && parsed >= 0 && parsed <= 100) ? parsed : 64;
   });
   const [criticality, setCriticality] = useState(() => {
-    return new URLSearchParams(window.location.search).get('criticality') || 'Standard Facility';
+    return getValidatedParam('criticality', ['Standard Facility', 'Mission Critical / Life Safety'], 'Standard Facility');
   });
   const [evidenceCompleteness, setEvidenceCompleteness] = useState(() => {
-    return new URLSearchParams(window.location.search).get('evidenceCompleteness') || 'Incomplete/Indeterminate Metadata';
+    return getValidatedParam('evidenceCompleteness', ['Complete Photo Set', 'Incomplete/Indeterminate Metadata'], 'Incomplete/Indeterminate Metadata');
   });
 
   // Sync state when active scenario changes
@@ -88,7 +93,7 @@ export default function Simulator() {
     }
   }, [activeScenarioKey]);
 
-  // Sync state if query parameters change
+  // Sync state if query parameters change (Demonstration Utility)
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
     const qAssetType = q.get('assetType');
@@ -97,11 +102,24 @@ export default function Simulator() {
     const qCriticality = q.get('criticality');
     const qCompleteness = q.get('evidenceCompleteness');
     
-    if (qAssetType) setAssetType(qAssetType);
-    if (qCondition) setCondition(qCondition);
-    if (qConfidence) setConfidence(parseInt(qConfidence));
-    if (qCriticality) setCriticality(qCriticality);
-    if (qCompleteness) setEvidenceCompleteness(qCompleteness);
+    if (qAssetType && ['Chiller', 'Pump', 'AHU', 'Fire Extinguisher'].includes(qAssetType)) {
+      setAssetType(qAssetType);
+    }
+    if (qCondition && ['Good', 'Fair', 'Poor', 'Critical'].includes(qCondition)) {
+      setCondition(qCondition);
+    }
+    if (qConfidence) {
+      const parsed = parseInt(qConfidence);
+      if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
+        setConfidence(parsed);
+      }
+    }
+    if (qCriticality && ['Standard Facility', 'Mission Critical / Life Safety'].includes(qCriticality)) {
+      setCriticality(qCriticality);
+    }
+    if (qCompleteness && ['Complete Photo Set', 'Incomplete/Indeterminate Metadata'].includes(qCompleteness)) {
+      setEvidenceCompleteness(qCompleteness);
+    }
   }, [window.location.search]);
 
   // Run evaluations using the centralized rules engine

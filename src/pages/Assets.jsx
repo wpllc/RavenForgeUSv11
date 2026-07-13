@@ -13,28 +13,33 @@ export default function Assets() {
   const [conditionFilter, setConditionFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
   
-  // Selected tab state
+  // Visual QA Query Synchronizer Utility — Demonstration and QA Only
+  const tabs = ['Summary', 'Technical Details', 'Supporting Evidence', 'Decision History'];
   const queryParams = new URLSearchParams(location.search);
   const queryTab = queryParams.get('tab');
-  const [activeTab, setActiveTab] = useState(queryTab || 'Summary'); // 'Summary', 'Technical Details', 'Supporting Evidence', 'Decision History'
+  const allowedTab = tabs.includes(queryTab) ? queryTab : 'Summary';
+  const [activeTab, setActiveTab] = useState(allowedTab);
 
-  // Selected asset state, pre-selecting if redirected from the dashboard
+  // Selected asset state, pre-selecting if redirected from the dashboard or query parameter
   const queryAssetId = queryParams.get('selectedAssetId');
-  const initialAssetId = queryAssetId || location.state?.selectedAssetId || 'AHU-02';
+  const isValidAsset = assetsList.some(a => a.id === queryAssetId);
+  const initialAssetId = (queryAssetId && isValidAsset) ? queryAssetId : (location.state?.selectedAssetId || 'AHU-02');
   const [selectedAssetId, setSelectedAssetId] = useState(initialAssetId);
   const detailPanelHeadingRef = useRef(null);
 
-  // Re-sync if state changes externally or via query parameters
+  // Re-sync if state changes externally or via query parameters (Demonstration Utility)
   useEffect(() => {
     const q = new URLSearchParams(location.search);
     const qAsset = q.get('selectedAssetId');
     const qTab = q.get('tab');
-    if (qAsset) {
+    
+    if (qAsset && assetsList.some(a => a.id === qAsset)) {
       setSelectedAssetId(qAsset);
     } else if (location.state?.selectedAssetId) {
       setSelectedAssetId(location.state.selectedAssetId);
     }
-    if (qTab) {
+    
+    if (qTab && tabs.includes(qTab)) {
       setActiveTab(qTab);
     }
   }, [location.state, location.search]);
@@ -60,8 +65,6 @@ export default function Assets() {
       detailPanelHeadingRef.current?.focus();
     }, 50);
   };
-
-  const tabs = ['Summary', 'Technical Details', 'Supporting Evidence', 'Decision History'];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
