@@ -1,11 +1,41 @@
-import React, { useState } from 'react';
-import { BookOpen, FileText, Download, Eye, X, CheckSquare, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { BookOpen, FileText, Download, Eye, X, AlertCircle } from 'lucide-react';
 import { reportsList, projectSummary } from '../data/demoData';
 
 export default function Reports() {
   const [previewReportId, setPreviewReportId] = useState(null);
+  const closeButtonRef = useRef(null);
+  const triggerRef = useRef(null);
 
   const activePreviewReport = reportsList.find(r => r.id === previewReportId);
+
+  // Handle modal backdrop clicks, Escape key, scroll locking, and focus restoration
+  useEffect(() => {
+    if (previewReportId) {
+      document.body.style.overflow = 'hidden';
+      // Delay focus slightly to ensure DOM is rendered
+      setTimeout(() => {
+        closeButtonRef.current?.focus();
+      }, 50);
+    } else {
+      document.body.style.overflow = '';
+      if (triggerRef.current) {
+        triggerRef.current.focus();
+      }
+    }
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && previewReportId) {
+        setPreviewReportId(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [previewReportId]);
 
   // Generate simulated mock contents for report previews
   const getMockReportContent = (reportId) => {
@@ -26,7 +56,7 @@ CAPITAL EXPENDITURE ESTIMATE (MOCK):
 - Priority 2 (12-24 month lifecycle):  $24,000
 - Priority 3 (Routine Maintenance):     $6,400
 
-VERIFICATION METRIC: 32/32 Policy Rules Verified Admissible.
+VERIFICATION METRIC: 32/32 Policy Rules Verified.
 QC OVERRIDES LOGGED: 2 manual entries signed off.
 ==========================================================`;
       case 'REP-002':
@@ -44,7 +74,7 @@ CHILLER-02  Chiller 02 Bldg B, Rooftop Deck           Fair
 FIRE-EXT-01 Ext 01     Bldg B, Corridor 201           Critical
 FIRE-EXT-02 Ext 02     Bldg B, Lobby Entrance         Good
 
-* Ledger entries bound with cryptographic parent hash registries.
+* Ledger entries bound with tamper-evident audit history records.
 ==========================================================`;
       case 'REP-003':
         return `==========================================================
@@ -74,83 +104,102 @@ RAVENFORGE SYSTEMS - MOCK COMPLIANCE PACKAGE
 ==========================================================
 SYSTEM STATUS: Nominally Validated
 EVIDENCE TRACEABILITY: Verified
-HASH DIGEST CHAIN: 0x8f2d512bd4588b9c...
+AUDIT REGISTER CHAIN: 0x8f2d512bd4588b9c...
 
 This document represents simulated data compiled during scenario runs.
 ==========================================================`;
     }
   };
 
+  const handleOpenPreview = (reportId, e) => {
+    triggerRef.current = e.currentTarget;
+    setPreviewReportId(reportId);
+  };
+
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       
       {/* HEADER */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#334155]/40 pb-4">
-        <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <BookOpen size={20} className="text-[#38bdf8]" />
-            Reports & Output Packages
-          </h1>
-          <p className="text-xs text-[#94a3b8]">
-            Generated summaries, inventory registers, and compliance files available for review.
-          </p>
+      <section className="card" style={{ padding: '20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+          <div>
+            <h1 style={{ fontSize: '28px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <BookOpen size={24} className="text-[#38bdf8]" aria-hidden="true" />
+              Reports
+            </h1>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+              Generated condition registers, summaries, and compliance reports available for review.
+            </p>
+          </div>
+          <div>
+            <span className="badge badge-gray" style={{ fontWeight: 'bold' }}>
+              Reports: {reportsList.length}
+            </span>
+          </div>
         </div>
-        <div className="bg-[#131c2e] border border-[#334155] rounded-md px-3 py-1 text-xs text-[#94a3b8] font-mono">
-          Report Types: <span className="text-white font-bold">{reportsList.length}</span>
-        </div>
-      </div>
+      </section>
 
       {/* COMPLIANCE DISCLOSURE */}
-      <section className="card bg-[#131c2e]/40 border-[#334155]/50 p-4">
-        <h2 className="text-xs font-mono font-bold text-amber-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-          <Sparkles size={14} className="text-amber-500" />
-          Simulated Deliverables Warning
+      <section className="card" style={{ borderLeft: '4px solid var(--color-amber)', background: 'var(--bg-secondary)', padding: '16px' }}>
+        <h2 style={{ fontSize: '14px', fontWeight: 600, color: '#fff', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <AlertCircle size={16} className="text-[#f59e0b]" aria-hidden="true" />
+          Demonstration Output Deliverables
         </h2>
-        <p className="text-xs text-[#94a3b8] leading-relaxed">
-          The deliverables listed below are generated using simulated pilot data. Click <strong>Preview Sample</strong> to view the text summaries inline. Download links are inactive since no physical files are written to disk.
+        <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+          The outputs listed below are mock files compiled from the sandbox dataset. Click <strong>Preview Sample</strong> to view the records. The file download links are disabled in this demo sandbox environment.
         </p>
       </section>
 
       {/* REPORTS LIST (CARDS) */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
         {reportsList.map((report) => (
-          <div key={report.id} className="card bg-[#131c2e]/60 border-[#334155]/60 hover:border-[#38bdf8]/40 transition flex flex-col justify-between p-5 space-y-4">
-            
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-[10px] font-mono text-[#64748b]">
+          <div 
+            key={report.id} 
+            className="card"
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              justifyContent: 'space-between',
+              gap: '16px'
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
                 <span>{report.id}</span>
                 <span>AUDIENCE: {report.audience}</span>
               </div>
               
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <FileText size={16} className="text-[#38bdf8]" />
+              <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <FileText size={16} className="text-[#38bdf8]" aria-hidden="true" />
                 {report.name}
               </h3>
               
-              <p className="text-xs text-[#94a3b8] leading-relaxed">
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
                 {report.description}
               </p>
             </div>
 
             {/* Actions Panel */}
-            <div className="flex items-center justify-between pt-3 border-t border-[#334155]/30 flex-wrap gap-2 text-xs font-mono">
-              <span className="text-[#64748b] text-[10px]">COMPILED: {report.lastGenerated}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', borderTop: '1px solid var(--border-color)', paddingTop: '12px', fontSize: '11px', color: 'var(--text-muted)' }}>
+              <span>COMPILED: {report.lastGenerated}</span>
               
-              <div className="flex gap-2">
+              <div style={{ display: 'flex', gap: '8px' }}>
                 <button 
-                  onClick={() => setPreviewReportId(report.id)}
-                  className="btn btn-secondary py-1.5 px-3 text-xs flex items-center gap-1 hover:border-[#38bdf8]"
+                  onClick={(e) => handleOpenPreview(report.id, e)}
+                  className="btn btn-secondary text-xs"
+                  style={{ padding: '6px 12px' }}
                 >
-                  <Eye size={12} />
-                  <span>Preview Sample</span>
+                  <Eye size={12} style={{ marginRight: '4px' }} />
+                  <span>Preview</span>
                 </button>
                 
                 <button 
                   disabled 
-                  className="btn bg-[#334155] text-[#64748b] cursor-not-allowed py-1.5 px-3 text-xs flex items-center gap-1"
+                  className="btn text-xs"
+                  style={{ backgroundColor: 'var(--border-muted)', color: 'var(--text-muted)', cursor: 'not-allowed', padding: '6px 12px' }}
                   title="No physical file available for download in this demo sandbox."
                 >
-                  <Download size={12} />
+                  <Download size={12} style={{ marginRight: '4px' }} />
                   <span>Download Inactive</span>
                 </button>
               </div>
@@ -162,39 +211,65 @@ This document represents simulated data compiled during scenario runs.
 
       {/* MOCK PREVIEW MODAL */}
       {previewReportId && activePreviewReport && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-[9999]">
-          <div className="bg-[#131c2e] border border-[#334155] w-full max-w-2xl rounded-lg shadow-2xl flex flex-col overflow-hidden">
+        <div 
+          className="fixed inset-0 flex items-center justify-center p-4 z-[9999]"
+          style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(3px)', zIndex: 1000 }}
+          onClick={() => setPreviewReportId(null)}
+        >
+          <div 
+            className="card"
+            style={{ 
+              backgroundColor: 'var(--bg-secondary)', 
+              border: '1px solid var(--border-color)', 
+              width: '100%', 
+              maxWidth: '640px', 
+              borderRadius: '8px', 
+              display: 'flex', 
+              flexDirection: 'column',
+              padding: 0,
+              overflow: 'hidden'
+            }}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Preview of ${activePreviewReport.name}`}
+          >
             
             {/* Modal Header */}
-            <div className="bg-[#0b0f19] px-5 py-4 border-b border-[#334155] flex justify-between items-center">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-primary)', padding: '16px 20px', borderBottom: '1px solid var(--border-color)' }}>
               <div>
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <FileText size={16} className="text-[#38bdf8]" />
+                <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FileText size={16} className="text-[#38bdf8]" aria-hidden="true" />
                   Preview: {activePreviewReport.name}
                 </h3>
-                <span className="text-[10px] text-[#64748b] font-mono">{activePreviewReport.id} // Demonstration Sample</span>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                  {activePreviewReport.id} // Demonstration Sample
+                </span>
               </div>
               <button 
+                ref={closeButtonRef}
                 onClick={() => setPreviewReportId(null)}
-                className="text-[#94a3b8] hover:text-white p-1 rounded"
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '4px' }}
+                aria-label="Close report preview"
               >
-                <X size={18} />
+                <X size={20} />
               </button>
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto max-h-[350px]">
-              <pre className="raw-json-block mt-0 font-mono text-xs whitespace-pre-wrap leading-relaxed">
+            <div style={{ padding: '20px', overflowY: 'auto', maxHeight: '350px' }}>
+              <pre className="raw-json-block" style={{ margin: 0, fontSize: '11px', whiteSpace: 'pre-wrap', fontFamily: 'var(--font-mono)', border: '1px solid var(--border-color)' }}>
                 {getMockReportContent(activePreviewReport.id)}
               </pre>
             </div>
 
             {/* Modal Footer */}
-            <div className="bg-[#0b0f19] px-5 py-3 border-t border-[#334155] flex justify-between items-center text-xs font-mono text-[#64748b]">
-              <span>* Simulated reporting outputs are for audit review validation.</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-primary)', padding: '12px 20px', borderTop: '1px solid var(--border-color)', fontSize: '11px', color: 'var(--text-muted)' }}>
+              <span>Simulated reporting output for audit validation.</span>
               <button 
                 onClick={() => setPreviewReportId(null)}
-                className="btn btn-secondary py-1.5 px-3 text-xs"
+                className="btn btn-secondary text-xs"
+                style={{ padding: '6px 12px' }}
               >
                 Close Preview
               </button>

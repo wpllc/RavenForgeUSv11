@@ -1,244 +1,307 @@
-import React, { useState } from 'react';
-import { Cpu, MapPin, ShieldAlert, Award, FileJson, CheckSquare, Eye, AlertCircle, FileText, Lock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Cpu, MapPin, Award, Eye, FileText, Search, Filter, ShieldCheck, HelpCircle } from 'lucide-react';
 import { assetsList, projectSummary } from '../data/demoData';
+import { getPriorityAssets } from '../data/selectors';
 
 export default function Assets() {
-  const [selectedAssetId, setSelectedAssetId] = useState('AHU-02');
-  const [activeTab, setActiveTab] = useState('executive');
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const selectedAsset = assetsList.find(a => a.id === selectedAssetId) || assetsList[0];
+  // Search, filter and sorting states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [conditionFilter, setConditionFilter] = useState('ALL');
+  const [statusFilter, setStatusFilter] = useState('ALL');
+
+  // Selected asset state, pre-selecting if redirected from the dashboard
+  const initialAssetId = location.state?.selectedAssetId || 'AHU-02';
+  const [selectedAssetId, setSelectedAssetId] = useState(initialAssetId);
+
+  // Re-sync if state changes externally
+  useEffect(() => {
+    if (location.state?.selectedAssetId) {
+      setSelectedAssetId(location.state.selectedAssetId);
+    }
+  }, [location.state]);
+
+  const priorityAssets = getPriorityAssets();
+
+  // Filtered list
+  const filteredAssets = priorityAssets.filter(asset => {
+    const matchesSearch = asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          asset.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          asset.location.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCondition = conditionFilter === 'ALL' || asset.condition === conditionFilter;
+    const matchesStatus = statusFilter === 'ALL' || asset.technicalFields.revalidationStatus === statusFilter;
+    return matchesSearch && matchesCondition && matchesStatus;
+  });
+
+  const selectedAsset = assetsList.find(a => a.id === selectedAssetId) || filteredAssets[0] || assetsList[0];
 
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       
       {/* PAGE HEADER */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#334155]/40 pb-4">
-        <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <Cpu size={20} className="text-[#38bdf8]" />
-            Unique Asset Portfolio
-          </h1>
-          <p className="text-xs text-[#94a3b8]">
-            Directory of the 8 unique assets evaluated during the pilot condition assessment.
-          </p>
+      <section className="card" style={{ padding: '20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+          <div>
+            <h1 style={{ fontSize: '28px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Cpu size={24} className="text-[#38bdf8]" aria-hidden="true" />
+              Asset Register
+            </h1>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+              Registered mechanical equipment inventory, status records, and recommended actions.
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: '12px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+            <span className="badge badge-gray" style={{ textTransform: 'none', fontWeight: 'bold' }}>
+              Total Unique Assets: {projectSummary.uniqueAssets}
+            </span>
+          </div>
         </div>
-        <div className="bg-[#131c2e] border border-[#334155] rounded-md px-3 py-1 text-xs text-[#94a3b8] font-mono">
-          Total Assets: <span className="text-white font-bold">{projectSummary.uniqueAssets}</span>
-        </div>
-      </div>
+      </section>
 
-      {/* TWO COLUMNS: ASSETS DIRECTORY & DETAIL PANEL */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      {/* FILTER & SEARCH BAR */}
+      <section className="card" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+          
+          {/* Search Box */}
+          <div style={{ position: 'relative', flex: 1, minWidth: '240px' }}>
+            <Search size={16} style={{ position: 'absolute', left: '12px', top: '11px', color: 'var(--text-muted)' }} />
+            <input 
+              type="text" 
+              placeholder="Search assets by name, ID, or location..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="text-input"
+              style={{ paddingLeft: '36px' }}
+              aria-label="Search assets"
+            />
+          </div>
+
+          {/* Condition Filter */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+            <Filter size={14} />
+            <span>Condition:</span>
+            <select
+              value={conditionFilter}
+              onChange={(e) => setConditionFilter(e.target.value)}
+              className="text-input"
+              style={{ width: 'auto', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '6px', color: '#fff', cursor: 'pointer' }}
+              aria-label="Filter by Condition"
+            >
+              <option value="ALL">All Conditions</option>
+              <option value="Critical">Critical</option>
+              <option value="Poor">Poor</option>
+              <option value="Fair">Fair</option>
+              <option value="Good">Good</option>
+            </select>
+          </div>
+
+          {/* Governance Status Filter */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+            <span>Decision:</span>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="text-input"
+              style={{ width: 'auto', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '6px', color: '#fff', cursor: 'pointer' }}
+              aria-label="Filter by Governance status"
+            >
+              <option value="ALL">All Decision States</option>
+              <option value="ADMISSIBLE">Passed checks</option>
+              <option value="ESCALATED">Requires Review</option>
+            </select>
+          </div>
+
+        </div>
+      </section>
+
+      {/* TWO COLUMNS: REGISTER TABLE/CARDS & DETAILS VIEW */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px' }}>
         
-        {/* LEFT COLUMN: ASSETS LIST (5 columns wide) */}
-        <div className="lg:col-span-5 space-y-3">
-          <div className="text-[10px] text-[#64748b] font-mono uppercase tracking-wider px-1">
-            Asset Inventory
-          </div>
+        {/* Row/Grid Container (12-column layout on large screens) */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', alignItems: 'start' }}>
           
-          <div className="space-y-2">
-            {assetsList.map((asset) => {
-              const isSelected = asset.id === selectedAssetId;
-              const isCritical = asset.priority === 'Critical';
-              const isWarning = asset.priority === 'High' || asset.priority === 'Action Required';
-              
-              return (
-                <button
-                  key={asset.id}
-                  onClick={() => {
-                    setSelectedAssetId(asset.id);
-                    setActiveTab('executive'); // Reset tab to executive on change
-                  }}
-                  className={`w-full text-left p-3.5 rounded-lg border transition-all flex justify-between items-center ${
-                    isSelected 
-                      ? 'bg-[#131c2e] border-[#38bdf8] shadow-[0_0_12px_rgba(56,189,248,0.1)]' 
-                      : 'bg-[#131c2e]/40 border-[#334155]/50 hover:border-[#334155] hover:bg-[#131c2e]/60'
-                  }`}
-                >
-                  <div className="space-y-1">
-                    <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                      {asset.name}
-                      <span className="text-[9px] text-[#64748b] font-mono">({asset.id})</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-[11px] text-[#94a3b8]">
-                      <MapPin size={11} className="text-[#64748b]" />
-                      <span>{asset.location}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col items-end gap-1.5">
-                    <span className={`badge ${
-                      isCritical ? 'badge-red' : isWarning ? 'badge-amber' : 'badge-green'
-                    }`}>
-                      {asset.condition}
-                    </span>
-                    <span className="text-[9px] text-[#64748b] font-mono">
-                      Conf: {Math.floor(asset.confidence * 100)}%
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* RIGHT COLUMN: DETAIL EXPLORER (7 columns wide) */}
-        <div className="lg:col-span-7 card bg-[#131c2e]/30 border-[#334155]/60 p-5 space-y-5">
-          
-          {/* Header Details */}
-          <div className="flex justify-between items-start gap-4 pb-4 border-b border-[#334155]/40">
-            <div>
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
-                {selectedAsset.name} 
-                <span className="text-xs text-[#64748b] font-mono">({selectedAsset.id})</span>
-              </h2>
-              <p className="text-xs text-[#94a3b8] mt-1 flex items-center gap-1">
-                <MapPin size={12} className="text-[#64748b]" />
-                {selectedAsset.location}
-              </p>
-            </div>
+          {/* LEFT PANEL: ASSET DIRECTORY REGISTER */}
+          <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#fff' }}>Asset Directory</h2>
             
-            <div className="text-right">
-              <span className="text-[9px] text-[#64748b] font-mono uppercase block">REVALIDATION STATE</span>
-              <span className={`badge mt-1 ${
-                selectedAsset.technicalFields.revalidationStatus === 'ESCALATED' ? 'badge-amber' : 'badge-green'
-              }`}>
-                {selectedAsset.technicalFields.revalidationStatus}
+            {/* Desktop Table View */}
+            <div className="table-container">
+              <table className="governance-table">
+                <thead>
+                  <tr>
+                    <th>Asset ID</th>
+                    <th>Location</th>
+                    <th>Condition</th>
+                    <th>Confidence</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredAssets.map(asset => {
+                    const isSelected = asset.id === selectedAssetId;
+                    const isCritical = asset.condition === 'Critical';
+                    const isPoor = asset.condition === 'Poor';
+                    return (
+                      <tr 
+                        key={asset.id} 
+                        onClick={() => setSelectedAssetId(asset.id)}
+                        style={{ cursor: 'pointer', backgroundColor: isSelected ? 'var(--bg-tertiary)' : 'transparent' }}
+                      >
+                        <td style={{ fontWeight: '600', color: isSelected ? 'var(--color-brand-light)' : '#fff' }}>
+                          {asset.name}
+                          <span style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'block', fontWeight: 'normal' }}>
+                            {asset.id}
+                          </span>
+                        </td>
+                        <td style={{ fontSize: '12px' }}>{asset.location}</td>
+                        <td>
+                          <span className={`badge ${isCritical ? 'badge-red' : isPoor ? 'badge-amber' : 'badge-green'}`}>
+                            {asset.condition}
+                          </span>
+                        </td>
+                        <td style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}>
+                          {Math.floor(asset.confidence * 100)}%
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {filteredAssets.length === 0 && (
+                    <tr>
+                      <td colSpan="4" style={{ textAlign: 'center', py: '20px', color: 'var(--text-muted)' }}>
+                        No assets match the search criteria.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* RIGHT PANEL: SELECTED ASSET DETAIL */}
+          <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            
+            {/* Header Details */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--border-color)', paddingBottom: '16px' }}>
+              <div>
+                <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#fff' }}>
+                  {selectedAsset.name}
+                </h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                  <MapPin size={12} style={{ color: 'var(--text-muted)' }} />
+                  <span>{selectedAsset.location}</span>
+                </div>
+              </div>
+              <span className="badge badge-gray" style={{ fontFamily: 'var(--font-mono)' }}>
+                {selectedAsset.id}
               </span>
             </div>
-          </div>
 
-          {/* TAB CONTROLS */}
-          <div className="flex border-b border-[#334155]/30 text-xs">
-            <button
-              onClick={() => setActiveTab('executive')}
-              className={`pb-2.5 px-4 font-semibold border-b-2 transition ${
-                activeTab === 'executive' 
-                  ? 'border-[#38bdf8] text-white' 
-                  : 'border-transparent text-[#64748b] hover:text-white'
-              }`}
-            >
-              Executive Summary
-            </button>
-            <button
-              onClick={() => setActiveTab('technical')}
-              className={`pb-2.5 px-4 font-semibold border-b-2 transition ${
-                activeTab === 'technical' 
-                  ? 'border-[#38bdf8] text-white' 
-                  : 'border-transparent text-[#64748b] hover:text-white'
-              }`}
-            >
-              Technical Data
-            </button>
-            <button
-              onClick={() => setActiveTab('evidence')}
-              className={`pb-2.5 px-4 font-semibold border-b-2 transition ${
-                activeTab === 'evidence' 
-                  ? 'border-[#38bdf8] text-white' 
-                  : 'border-transparent text-[#64748b] hover:text-white'
-              }`}
-            >
-              Evidence Logs
-            </button>
-          </div>
-
-          {/* TAB CONTENTS */}
-          <div className="space-y-4 min-h-[160px]">
-            
-            {/* EXECUTIVE VIEW */}
-            {activeTab === 'executive' && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <h4 className="text-xs font-mono uppercase text-[#38bdf8]">Priority Condition Finding</h4>
-                  <p className="text-xs text-[#94a3b8] leading-relaxed">
-                    {selectedAsset.findings}
-                  </p>
-                </div>
-
-                <div className="p-3.5 bg-amber-500/5 border border-amber-500/20 rounded-lg">
-                  <h4 className="text-xs font-bold text-amber-500 flex items-center gap-1.5 mb-1.5">
-                    <ShieldAlert size={14} />
-                    RECOMMENDED PLAN OF ACTION
-                  </h4>
-                  <p className="text-xs text-white leading-relaxed font-medium">
-                    {selectedAsset.recommendation}
-                  </p>
-                </div>
+            {/* Condition & status block */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px' }}>
+              <div style={{ background: 'var(--bg-primary)', padding: '12px', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 'bold', textTransform: 'uppercase', display: 'block' }}>
+                  Condition Health
+                </span>
+                <span className={`badge ${selectedAsset.condition === 'Critical' ? 'badge-red' : selectedAsset.condition === 'Poor' ? 'badge-amber' : 'badge-green'}`} style={{ marginTop: '4px' }}>
+                  {selectedAsset.condition}
+                </span>
               </div>
-            )}
 
-            {/* TECHNICAL DETAILS */}
-            {activeTab === 'technical' && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4 text-xs font-mono">
-                  <div className="bg-[#0b0f19] p-3 rounded-lg border border-[#334155]/20">
-                    <span className="text-[#64748b] block mb-1">SERIAL NUMBER</span>
-                    <span className="text-white font-bold">{selectedAsset.technicalFields.serialNumber}</span>
-                  </div>
-                  <div className="bg-[#0b0f19] p-3 rounded-lg border border-[#334155]/20">
-                    <span className="text-[#64748b] block mb-1">MANUFACTURER</span>
-                    <span className="text-white font-bold">{selectedAsset.technicalFields.manufacturer}</span>
-                  </div>
-                  <div className="bg-[#0b0f19] p-3 rounded-lg border border-[#334155]/20">
-                    <span className="text-[#64748b] block mb-1">INSTALLATION YEAR</span>
-                    <span className="text-white font-bold">{selectedAsset.technicalFields.installYear}</span>
-                  </div>
-                  <div className="bg-[#0b0f19] p-3 rounded-lg border border-[#334155]/20">
-                    <span className="text-[#64748b] block mb-1">DESIGN LIFE INTERVAL</span>
-                    <span className="text-white font-bold">{selectedAsset.technicalFields.designLifeYears} Years</span>
-                  </div>
-                </div>
-
-                {/* Rules Checked list */}
-                <div className="space-y-2">
-                  <h4 className="text-xs font-mono uppercase text-[#38bdf8] px-1">Enforced Policy Check Results</h4>
-                  <div className="space-y-1.5">
-                    {selectedAsset.technicalFields.ruleChecks.length > 0 ? (
-                      selectedAsset.technicalFields.ruleChecks.map((rule, idx) => (
-                        <div key={idx} className="flex justify-between items-center bg-[#0b0f19] p-2.5 rounded border border-[#334155]/30 text-xs font-mono">
-                          <div className="flex items-center gap-2">
-                            <span className={`h-2.5 w-2.5 rounded-full ${
-                              rule.status === 'PASS' ? 'bg-[#22c55e]' : rule.status === 'TRIGGERED' ? 'bg-amber-500' : 'bg-red-500'
-                            }`} />
-                            <span className="text-white">{rule.rule}</span>
-                          </div>
-                          <span className={rule.status === 'PASS' ? 'text-[#22c55e]' : 'text-amber-500'}>{rule.detail}</span>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="text-xs text-[#64748b] font-mono py-2 text-center">
-                        No policy rule violations logged for this asset.
-                      </div>
-                    )}
-                  </div>
-                </div>
+              <div style={{ background: 'var(--bg-primary)', padding: '12px', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 'bold', textTransform: 'uppercase', display: 'block' }}>
+                  System Confidence
+                </span>
+                <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#fff', display: 'block', marginTop: '4px', fontFamily: 'var(--font-mono)' }}>
+                  {Math.floor(selectedAsset.confidence * 100)}%
+                </span>
               </div>
-            )}
 
-            {/* EVIDENCE LOGS */}
-            {activeTab === 'evidence' && (
-              <div className="space-y-3">
-                <h4 className="text-xs font-mono uppercase text-[#38bdf8] px-1">Linked Physical Evidence Logs</h4>
-                <ul className="space-y-2 text-xs">
-                  {selectedAsset.evidenceDetails.map((detail, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5 bg-[#0b0f19] p-3 rounded-lg border border-[#334155]/20">
-                      <div className="h-5 w-5 rounded bg-[#131c2e] border border-[#334155] flex items-center justify-center text-[#38bdf8] shrink-0 font-mono text-[10px]">
-                        {idx + 1}
-                      </div>
-                      <p className="text-[#94a3b8] leading-relaxed">{detail}</p>
-                    </li>
-                  ))}
-                </ul>
+              <div style={{ background: 'var(--bg-primary)', padding: '12px', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 'bold', textTransform: 'uppercase', display: 'block' }}>
+                  Decision Status
+                </span>
+                <span style={{ fontSize: '13px', fontWeight: 600, color: '#fff', display: 'block', marginTop: '4px' }}>
+                  {selectedAsset.technicalFields.revalidationStatus === 'ADMISSIBLE' 
+                    ? 'Passed checks'
+                    : 'Requires Review'
+                  }
+                </span>
               </div>
-            )}
+            </div>
 
-          </div>
+            {/* Primary Finding */}
+            <div>
+              <h3 style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
+                Primary Finding
+              </h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                {selectedAsset.findings}
+              </p>
+            </div>
 
-          {/* EXPANDABLE RAW MACHINE DATA */}
-          <div className="pt-4 border-t border-[#334155]/40">
-            <details className="expandable-details">
-              <summary>Expose Raw Decisional Manifest</summary>
-              <div className="raw-json-block mt-3 text-left">
+            {/* Recommended Action */}
+            <div style={{ padding: '16px', background: 'rgba(2, 132, 199, 0.05)', border: '1px solid rgba(2, 132, 199, 0.2)', borderRadius: '6px' }}>
+              <h3 style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--color-brand-light)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
+                Recommended Action
+              </h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 500, lineHeight: '1.5' }}>
+                {selectedAsset.recommendation}
+              </p>
+            </div>
+
+            {/* Evidence Logs */}
+            <div>
+              <h3 style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
+                Linked Source Evidence
+              </h3>
+              <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {selectedAsset.evidenceDetails.map((detail, idx) => (
+                  <li 
+                    key={idx} 
+                    style={{ 
+                      display: 'flex', 
+                      alignItems: 'flex-start', 
+                      gap: '8px', 
+                      fontSize: '12px', 
+                      color: 'var(--text-secondary)',
+                      background: 'var(--bg-primary)',
+                      padding: '8px 12px',
+                      borderRadius: '4px',
+                      border: '1px solid var(--border-color)'
+                    }}
+                  >
+                    <span style={{ fontWeight: 'bold', color: 'var(--color-brand-light)', minWidth: '16px' }}>{idx + 1}.</span>
+                    <span>{detail}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Action Triggers */}
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
+              <button 
+                onClick={() => navigate('/evidence')} 
+                className="btn btn-secondary" 
+                style={{ fontSize: '12px', padding: '6px 12px' }}
+              >
+                View Source Evidence
+              </button>
+              <button 
+                onClick={() => navigate('/audit-trail')} 
+                className="btn btn-secondary" 
+                style={{ fontSize: '12px', padding: '6px 12px' }}
+              >
+                Trace Decision
+              </button>
+            </div>
+
+            {/* Advanced Decision Record Disclosure */}
+            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '12px' }}>
+              <details className="expandable-details" style={{ margin: 0 }}>
+                <summary>View Decision Record</summary>
+                <div className="raw-json-block mt-3 text-left">
 {`{
   "asset_id": "${selectedAsset.id}",
   "confidence_rating": ${selectedAsset.confidence},
@@ -246,11 +309,14 @@ export default function Assets() {
   "telemetry": {
     "photos_ingested": ${selectedAsset.photoCount},
     "gps_cluster": "${selectedAsset.location}",
-    "sha256_evidence_block": "0x8f2d512bd45${selectedAssetId === 'AHU-02' ? '88' : '12'}b9c"
-  }
+    "sha256_evidence_block": "0x8f2d512bd45${selectedAsset.id === 'AHU-02' ? '88' : '12'}b9c (Demo Placeholder)"
+  },
+  "demo_placeholder_notice": "This record contains mock values for scenario demonstration purposes only."
 }`}
-              </div>
-            </details>
+                </div>
+              </details>
+            </div>
+
           </div>
 
         </div>
