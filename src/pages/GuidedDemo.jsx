@@ -1,22 +1,38 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   ChevronRight, ArrowRight, Check, AlertTriangle, ShieldCheck, 
-  Eye, FileText, Database, ShieldAlert, Cpu, Layers, RefreshCw, ChevronLeft
+  Eye, FileText, Database, ShieldAlert, Cpu, Layers, RefreshCw, ChevronLeft, Activity
 } from 'lucide-react';
 import { projectSummary } from '../data/demoData';
 
 export default function GuidedDemo() {
   const navigate = useNavigate();
-  const [activePhase, setActivePhase] = useState(1);
+  const location = useLocation();
+
+  // Visual QA Query Synchronizer Utility — Demonstration and QA Only
+  const [activePhase, setActivePhase] = useState(() => {
+    const qStep = new URLSearchParams(location.search).get('step');
+    const parsed = parseInt(qStep);
+    return (!isNaN(parsed) && parsed >= 1 && parsed <= 5) ? parsed : 1;
+  });
   const [internalsExpanded, setInternalsExpanded] = useState(true);
+
+  // Sync state if query parameters change (Demonstration Utility)
+  useEffect(() => {
+    const qStep = new URLSearchParams(location.search).get('step');
+    const parsed = parseInt(qStep);
+    if (!isNaN(parsed) && parsed >= 1 && parsed <= 5) {
+      setActivePhase(parsed);
+    }
+  }, [location.search]);
 
   const phases = [
     { id: 1, label: 'Evidence Intake', status: 'COMPLETED' },
     { id: 2, label: 'Organize and Identify', status: 'COMPLETED' },
     { id: 3, label: 'Evaluate Findings', status: 'COMPLETED' },
     { id: 4, label: 'Human Review', status: 'AMBER' }, 
-    { id: 5, label: 'Decision & Audit', status: 'APPROVED' }
+    { id: 5, label: 'Decision and Audit', status: 'APPROVED' }
   ];
 
   // System events synchronized with milestones
