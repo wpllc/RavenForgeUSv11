@@ -1,108 +1,118 @@
 import React from 'react';
-import { Shield, Clock, Search, ShieldAlert, Cpu, Sparkles } from 'lucide-react';
+import { Shield, Clock, Search, ShieldAlert, Cpu } from 'lucide-react';
 
 export default function HowItWorks() {
   return (
-    <div className="space-y-8">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       
       {/* HEADER */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#334155]/40 pb-4">
-        <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <Shield size={20} className="text-[#38bdf8]" />
-            How RavenForge Works
-          </h1>
-          <p className="text-xs text-[#94a3b8]">
-            Plain-language documentation detailing our validation, revalidation, and decision-gate engines.
-          </p>
+      <section className="card" style={{ padding: '20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+          <div>
+            <h1 style={{ fontSize: '28px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Shield size={24} className="text-[#38bdf8]" aria-hidden="true" />
+              How It Works
+            </h1>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+              Plain-language documentation detailing our validation, rules checking, and decision gate engines.
+            </p>
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* THE 4 PILLARS GRID */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
         
         {/* PILLAR 1: TEMPORAL AWARENESS */}
-        <div className="card space-y-3">
-          <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <Clock size={16} className="text-[#38bdf8]" />
-            1. Temporal Awareness & Confidence Decay
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Clock size={16} className="text-[#38bdf8]" aria-hidden="true" />
+            1. Temporal Confidence Decay
           </h3>
-          <p className="text-xs text-[#94a3b8] leading-relaxed">
-            Decisions are only as good as the evidence they rest on. RavenForge tracks the age of every photo and observation log. As evidence ages, its confidence index decays automatically. If local weather conditions degrade or communications flicker, the decay rate increases, eventually triggering a sensor revalidation check when thresholds are crossed.
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+            Decisions are only as good as the evidence they rest on. RavenForge tracks the age of every photo and observation log. As evidence ages, its confidence index decays automatically. If local conditions degrade or inspections are delayed, the decay rate increases, eventually triggering a revalidation check.
           </p>
         </div>
 
         {/* PILLAR 2: ENTITY DEDUPLICATION */}
-        <div className="card space-y-3">
-          <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <Search size={16} className="text-[#38bdf8]" />
-            2. Entity Reconstruction & Deduplication
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Search size={16} className="text-[#38bdf8]" aria-hidden="true" />
+            2. Sequence-to-Asset Mapping
           </h3>
-          <p className="text-xs text-[#94a3b8] leading-relaxed">
-            Inspectors frequently capture multiple overlapping angles of the same mechanical asset, cluttering database schemas. RavenForge matches image similarity indexes and spatial metadata clusters to automatically group raw files into consolidated photo sequences, mapping them to 8 unique assets without losing details.
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+            Inspectors frequently capture multiple overlapping angles of the same mechanical asset. RavenForge matches image similarity indexes and spatial metadata clusters to automatically group raw files into consolidated photo sequences, mapping them to unique assets without losing context.
           </p>
         </div>
 
         {/* PILLAR 3: POLICY RULE ENFORCEMENT */}
-        <div className="card space-y-3">
-          <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <Cpu size={16} className="text-[#38bdf8]" />
-            3. Boundary & Life-Expectancy Checks
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Cpu size={16} className="text-[#38bdf8]" aria-hidden="true" />
+            3. Safety and Decision Rules
           </h3>
-          <p className="text-xs text-[#94a3b8] leading-relaxed">
-            The platform enforces strict physical and operational limits. For example, if a compressor install date exceeds its design service window (18 years against a 15-year limit), or a fire extinguisher tag is older than 12 months, the engine triggers policy warnings and records the anomaly details to the decision logs.
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+            The platform enforces strict physical and operational limits. For example, if a compressor install date exceeds its design service window (18 years against a 15-year limit), or a fire extinguisher tag is older than 12 months, the engine triggers rule warnings and records the anomaly details to decision logs.
           </p>
         </div>
 
         {/* PILLAR 4: ADMISSIBILITY GATES */}
-        <div className="card space-y-3">
-          <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <ShieldAlert size={16} className="text-amber-500" />
-            4. Admissibility Gate Execution
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <ShieldAlert size={16} className="text-amber-500" aria-hidden="true" />
+            4. Admissibility and Decision Gates
           </h3>
-          <p className="text-xs text-[#94a3b8] leading-relaxed">
-            Admissibility gates function as an active boundary layer between model outputs and action execution. If statistical confidence falls below limits (such as a 64% OCR match on a serial key), the gate blocks automated compilation and routes the item to human queues for manual operator sign-off.
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+            Admissibility gates function as an active boundary layer between model outputs and action execution. If statistical confidence falls below limits (such as a 64% OCR match on a serial key), the gate blocks automated compilation and routes the item to human queues for manual operator review.
           </p>
         </div>
 
       </section>
 
       {/* CORE LOGIC TREE EXPLANATION */}
-      <section className="card bg-[#131c2e] border-[#334155]">
-        <h3 className="text-xs uppercase tracking-widest text-[#64748b] font-mono font-bold mb-4">
+      <section className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Decisional Gating Logic Tree
         </h3>
         
-        <div className="space-y-4 text-xs font-mono text-[#94a3b8]">
-          <div className="flex gap-4 p-3 bg-[#0b0f19] border border-[#334155]/20 rounded-lg">
-            <div className="text-white font-bold shrink-0">STEP 1</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '13px', fontFamily: 'var(--font-mono)' }}>
+          <div style={{ display: 'flex', gap: '12px', padding: '12px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '6px' }}>
+            <div style={{ color: '#fff', fontWeight: 'bold' }}>STEP 1</div>
             <div>
-              <strong className="text-white">Physical Validation Check</strong>
-              <p className="text-[11px] mt-0.5 font-sans leading-relaxed">Does the asset exist and are coordinate logs available? (If fail: State set to IMPOSSIBLE, halts process).</p>
+              <strong style={{ color: '#fff' }}>Physical Validation Check</strong>
+              <p style={{ fontSize: '12px', marginTop: '4px', fontFamily: 'var(--font-sans)', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                Does the asset exist and are coordinate logs available? (If fail: State set to IMPOSSIBLE, halts process).
+              </p>
             </div>
           </div>
 
-          <div className="flex gap-4 p-3 bg-[#0b0f19] border border-[#334155]/20 rounded-lg">
-            <div className="text-white font-bold shrink-0">STEP 2</div>
+          <div style={{ display: 'flex', gap: '12px', padding: '12px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '6px' }}>
+            <div style={{ color: '#fff', fontWeight: 'bold' }}>STEP 2</div>
             <div>
-              <strong className="text-white">Safety Policy Enforcement</strong>
-              <p className="text-[11px] mt-0.5 font-sans leading-relaxed">Does the condition metric violate core fire safety or operational lifetimes? (If fail: State set to FORBIDDEN, halts process).</p>
+              <strong style={{ color: '#fff' }}>Safety Policy Enforcement</strong>
+              <p style={{ fontSize: '12px', marginTop: '4px', fontFamily: 'var(--font-sans)', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                Does the condition metric violate core fire safety or operational lifetimes? (If fail: State set to FORBIDDEN, halts process).
+              </p>
             </div>
           </div>
 
-          <div className="flex gap-4 p-3 bg-[#0b0f19] border border-[#334155]/20 rounded-lg">
-            <div className="text-white font-bold shrink-0">STEP 3</div>
+          <div style={{ display: 'flex', gap: '12px', padding: '12px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '6px' }}>
+            <div style={{ color: '#fff', fontWeight: 'bold' }}>STEP 3</div>
             <div>
-              <strong className="text-white">Confidence Validation</strong>
-              <p className="text-[11px] mt-0.5 font-sans leading-relaxed">Are the raw photo similarity readings or nameplate OCR scans above 75% confidence? (If fail: State set to ESCALATED, routes to Review Queue).</p>
+              <strong style={{ color: '#fff' }}>Confidence Validation</strong>
+              <p style={{ fontSize: '12px', marginTop: '4px', fontFamily: 'var(--font-sans)', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                Are the raw photo similarity readings or nameplate OCR scans above 75% confidence? (If fail: State set to ESCALATED, routes to Review Queue).
+              </p>
             </div>
           </div>
 
-          <div className="flex gap-4 p-3 bg-[#0b0f19] border border-[#334155]/20 rounded-lg">
-            <div className="text-white font-bold shrink-0">STEP 4</div>
+          <div style={{ display: 'flex', gap: '12px', padding: '12px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '6px' }}>
+            <div style={{ color: '#fff', fontWeight: 'bold' }}>STEP 4</div>
             <div>
-              <strong className="text-white">Chained Decisional Signing</strong>
-              <p className="text-[11px] mt-0.5 font-sans leading-relaxed">If all check steps pass: Recommendation compiled to ledger, marked ADMISSIBLE, and signed with SHA-256 block hash key.</p>
+              <strong style={{ color: '#fff' }}>Chained Decisional Signing</strong>
+              <p style={{ fontSize: '12px', marginTop: '4px', fontFamily: 'var(--font-sans)', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                If all check steps pass: Recommendation compiled to ledger, marked PASSED checks, and recorded with a tamper-evident audit signature.
+              </p>
             </div>
           </div>
         </div>
