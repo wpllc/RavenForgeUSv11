@@ -1,18 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, AlertCircle, Eye, UserCheck, Image, ArrowRight } from 'lucide-react';
 import { reviewQueueList } from '../data/demoData';
 
 export default function ReviewQueue() {
   const navigate = useNavigate();
-  const [items, setItems] = useState(
-    reviewQueueList.map(item => ({
+  const [items, setItems] = useState(() => {
+    const isQueryEmpty = new URLSearchParams(window.location.search).get('empty') === 'true';
+    if (isQueryEmpty) return [];
+    return reviewQueueList.map(item => ({
       ...item,
       operatorAction: null, // 'APPROVED', 'CORRECTED', 'ESCALATED', 'DEFERRED'
       operatorNotes: '',
       correctionInput: ''
-    }))
-  );
+    }));
+  });
+
+  // Re-sync items if query parameters change
+  useEffect(() => {
+    const isQueryEmpty = new URLSearchParams(window.location.search).get('empty') === 'true';
+    if (isQueryEmpty) {
+      setItems([]);
+    } else {
+      setItems(reviewQueueList.map(item => ({
+        ...item,
+        operatorAction: null,
+        operatorNotes: '',
+        correctionInput: ''
+      })));
+    }
+  }, [window.location.search]);
 
   const handleAction = (itemId, actionType) => {
     setItems(prevItems => 

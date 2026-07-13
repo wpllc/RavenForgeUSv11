@@ -12,21 +12,40 @@ import {
   Activity, 
   Menu, 
   X, 
-  Settings
+  Settings,
+  ChevronDown
 } from 'lucide-react';
 import { getPendingReviewCount } from '../data/selectors';
 
 export default function HUDLayout({ children }) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const menuButtonRef = useRef(null);
+
+  // Parse mobileMenuOpen query parameter
+  const queryParams = new URLSearchParams(location.search);
+  const isMobileQuery = queryParams.get('mobileMenuOpen') === 'true';
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(isMobileQuery);
+
+  // Sync state if query changes
+  useEffect(() => {
+    const q = new URLSearchParams(location.search);
+    if (q.get('mobileMenuOpen') === 'true') {
+      setMobileMenuOpen(true);
+    } else {
+      setMobileMenuOpen(false);
+    }
+  }, [location.search]);
 
   // Derive counts dynamically from dataset
   const pendingReviews = getPendingReviewCount();
 
   // Close mobile drawer on route change
   useEffect(() => {
-    setMobileMenuOpen(false);
+    // Only close if it's not a forced query-param state
+    const q = new URLSearchParams(window.location.search);
+    if (q.get('mobileMenuOpen') !== 'true') {
+      setMobileMenuOpen(false);
+    }
   }, [location.pathname]);
 
   // Handle body scroll locking, escape key listener, and resize resets
@@ -133,10 +152,10 @@ export default function HUDLayout({ children }) {
         </div>
       </header>
 
-      {/* 3. DESKTOP HORIZONTAL NAVIGATION RIBBON */}
+      {/* 3. DESKTOP HORIZONTAL Navigation Ribbon (With Dropdown for Secondary items) */}
       <div className="desktop-nav-ribbon bg-[#0f172a]" role="navigation" aria-label="Main Navigation">
         {/* Primary Links */}
-        <div style={{ display: 'flex', alignItems: 'center', height: '100%', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', height: '100%', gap: '4px', flex: 1 }}>
           {primaryItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -158,25 +177,33 @@ export default function HUDLayout({ children }) {
           })}
         </div>
 
-        {/* Divider */}
-        <div style={{ height: '20px', width: '1px', backgroundColor: 'var(--border-color)', margin: '0 8px' }} aria-hidden="true" />
-
-        {/* Secondary Links */}
-        <div style={{ display: 'flex', alignItems: 'center', height: '100%', gap: '8px' }}>
-          {secondaryItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className={({ isActive }) => `nav-ribbon-link ${isActive ? 'active' : ''}`}
-                aria-current={location.pathname === item.path ? 'page' : undefined}
-              >
-                <Icon size={14} aria-hidden="true" />
-                <span>{item.label}</span>
-              </NavLink>
-            );
-          })}
+        {/* Secondary Links Dropdown to prevent scrollbar/wrap wrapping */}
+        <div className="nav-dropdown-container">
+          <button 
+            className="nav-ribbon-link dropdown-trigger" 
+            aria-haspopup="true"
+            aria-expanded="false"
+            style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}
+          >
+            <Settings size={14} aria-hidden="true" />
+            <span>More</span>
+            <ChevronDown size={12} style={{ marginLeft: '4px' }} aria-hidden="true" />
+          </button>
+          <div className="nav-dropdown-menu">
+            {secondaryItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  className={({ isActive }) => `dropdown-menu-item ${isActive ? 'active' : ''}`}
+                >
+                  <Icon size={14} aria-hidden="true" />
+                  <span>{item.label}</span>
+                </NavLink>
+              );
+            })}
+          </div>
         </div>
       </div>
 

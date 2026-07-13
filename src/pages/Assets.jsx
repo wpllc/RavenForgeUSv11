@@ -14,23 +14,30 @@ export default function Assets() {
   const [statusFilter, setStatusFilter] = useState('ALL');
   
   // Selected tab state
-  const [activeTab, setActiveTab] = useState('Summary'); // 'Summary', 'Technical Details', 'Supporting Evidence', 'Decision History'
+  const queryParams = new URLSearchParams(location.search);
+  const queryTab = queryParams.get('tab');
+  const [activeTab, setActiveTab] = useState(queryTab || 'Summary'); // 'Summary', 'Technical Details', 'Supporting Evidence', 'Decision History'
 
   // Selected asset state, pre-selecting if redirected from the dashboard
-  const initialAssetId = location.state?.selectedAssetId || 'AHU-02';
+  const queryAssetId = queryParams.get('selectedAssetId');
+  const initialAssetId = queryAssetId || location.state?.selectedAssetId || 'AHU-02';
   const [selectedAssetId, setSelectedAssetId] = useState(initialAssetId);
   const detailPanelHeadingRef = useRef(null);
 
-  // Re-sync if state changes externally
+  // Re-sync if state changes externally or via query parameters
   useEffect(() => {
-    if (location.state?.selectedAssetId) {
+    const q = new URLSearchParams(location.search);
+    const qAsset = q.get('selectedAssetId');
+    const qTab = q.get('tab');
+    if (qAsset) {
+      setSelectedAssetId(qAsset);
+    } else if (location.state?.selectedAssetId) {
       setSelectedAssetId(location.state.selectedAssetId);
-      // Focus on detail panel heading for screen reader accessibility
-      setTimeout(() => {
-        detailPanelHeadingRef.current?.focus();
-      }, 50);
     }
-  }, [location.state]);
+    if (qTab) {
+      setActiveTab(qTab);
+    }
+  }, [location.state, location.search]);
 
   const priorityAssets = getPriorityAssets();
 

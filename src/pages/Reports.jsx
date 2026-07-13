@@ -3,9 +3,17 @@ import { BookOpen, FileText, Download, Eye, X, AlertCircle } from 'lucide-react'
 import { reportsList, projectSummary } from '../data/demoData';
 
 export default function Reports() {
-  const [previewReportId, setPreviewReportId] = useState(null);
+  const [previewReportId, setPreviewReportId] = useState(() => {
+    return new URLSearchParams(window.location.search).get('previewReportId');
+  });
   const closeButtonRef = useRef(null);
   const triggerRef = useRef(null);
+
+  // Sync state if query parameters change
+  useEffect(() => {
+    const qId = new URLSearchParams(window.location.search).get('previewReportId');
+    setPreviewReportId(qId);
+  }, [window.location.search]);
 
   const handleDownload = (report) => {
     const text = getMockReportContent(report.id);

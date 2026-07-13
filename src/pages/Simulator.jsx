@@ -55,14 +55,29 @@ export default function Simulator() {
   const [activeScenarioKey, setActiveScenarioKey] = useState('ocr_mismatch');
   
   // Simulation parameters
-  const [assetType, setAssetType] = useState('Chiller');
-  const [condition, setCondition] = useState('Fair');
-  const [confidence, setConfidence] = useState(64);
-  const [criticality, setCriticality] = useState('Standard Facility');
-  const [evidenceCompleteness, setEvidenceCompleteness] = useState('Incomplete/Indeterminate Metadata');
+  const [assetType, setAssetType] = useState(() => {
+    return new URLSearchParams(window.location.search).get('assetType') || 'Chiller';
+  });
+  const [condition, setCondition] = useState(() => {
+    return new URLSearchParams(window.location.search).get('condition') || 'Fair';
+  });
+  const [confidence, setConfidence] = useState(() => {
+    const val = new URLSearchParams(window.location.search).get('confidence');
+    return val ? parseInt(val) : 64;
+  });
+  const [criticality, setCriticality] = useState(() => {
+    return new URLSearchParams(window.location.search).get('criticality') || 'Standard Facility';
+  });
+  const [evidenceCompleteness, setEvidenceCompleteness] = useState(() => {
+    return new URLSearchParams(window.location.search).get('evidenceCompleteness') || 'Incomplete/Indeterminate Metadata';
+  });
 
   // Sync state when active scenario changes
   useEffect(() => {
+    // Only apply preset scenario values if no query parameter overrides exist
+    const q = new URLSearchParams(window.location.search);
+    if (q.toString()) return;
+    
     const sc = scenarios[activeScenarioKey];
     if (sc) {
       setAssetType(sc.assetType);
@@ -72,6 +87,22 @@ export default function Simulator() {
       setEvidenceCompleteness(sc.evidenceCompleteness);
     }
   }, [activeScenarioKey]);
+
+  // Sync state if query parameters change
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const qAssetType = q.get('assetType');
+    const qCondition = q.get('condition');
+    const qConfidence = q.get('confidence');
+    const qCriticality = q.get('criticality');
+    const qCompleteness = q.get('evidenceCompleteness');
+    
+    if (qAssetType) setAssetType(qAssetType);
+    if (qCondition) setCondition(qCondition);
+    if (qConfidence) setConfidence(parseInt(qConfidence));
+    if (qCriticality) setCriticality(qCriticality);
+    if (qCompleteness) setEvidenceCompleteness(qCompleteness);
+  }, [window.location.search]);
 
   // Run evaluations using the centralized rules engine
   const baselineScenario = scenarios[activeScenarioKey];
