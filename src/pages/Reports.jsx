@@ -69,7 +69,7 @@ export default function Reports() {
     switch (reportId) {
       case 'REP-001':
         return `==========================================================
-RAVENFORGE SYSTEMS - EXECUTIVE SUMMARY REPORT (SIMULATED)
+RavenForge - EXECUTIVE SUMMARY REPORT (SIMULATED)
 ==========================================================
 REPORT TITLE: Executive Condition Summary
 ASSESSMENT NAME: Building A Pilot Condition Assessment
@@ -94,7 +94,7 @@ QC OVERRIDES LOGGED: 2 manual entries signed off in active session
 ==========================================================`;
       case 'REP-002':
         return `==========================================================
-RAVENFORGE SYSTEMS - ASSET REGISTER LEDGER (SIMULATED)
+RavenForge - ASSET REGISTER LEDGER (SIMULATED)
 ==========================================================
 REPORT TITLE: Asset Registry Inventory Ledger
 ASSESSMENT NAME: Building A Pilot Condition Assessment
@@ -118,7 +118,7 @@ FIRE-EXT-02 Ext 02     Bldg B, Lobby Entrance         Good
 ==========================================================`;
       case 'REP-003':
         return `==========================================================
-RAVENFORGE SYSTEMS - PRIORITY FINDINGS DRILLDOWN (SIMULATED)
+RavenForge - PRIORITY FINDINGS DRILLDOWN (SIMULATED)
 ==========================================================
 REPORT TITLE: Critical and Poor Condition Findings Drilldown
 ASSESSMENT NAME: Building A Pilot Condition Assessment
@@ -147,7 +147,7 @@ RECOMMENDATION: Re-tag & re-charge pressure cylinder immediately.
 ==========================================================`;
       default:
         return `==========================================================
-RAVENFORGE SYSTEMS - MOCK COMPLIANCE PACKAGE
+RavenForge - MOCK COMPLIANCE PACKAGE
 ==========================================================
 REPORT TITLE: Simulated Verification Records Checklist
 ASSESSMENT NAME: Building A Pilot Condition Assessment

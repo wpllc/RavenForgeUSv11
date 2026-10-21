@@ -13,6 +13,8 @@ import Reports from './pages/Reports';
 import AuditTrail from './pages/AuditTrail';
 import HowItWorks from './pages/HowItWorks';
 import Simulator from './pages/Simulator';
+import About from './pages/About';
+import Cockpit from './pages/Cockpit';
 
 export default function App() {
   return (
@@ -23,6 +25,8 @@ export default function App() {
           <Route path="/" element={<Navigate to="/overview" replace />} />
           
           {/* Clean route nodes */}
+          <Route path="/creator" element={<About />} />
+          <Route path="/cockpit" element={<Cockpit />} />
           <Route path="/overview" element={<Overview />} />
           <Route path="/guided-demo" element={<GuidedDemo />} />
           <Route path="/evidence" element={<Evidence />} />
@@ -48,8 +52,8 @@ export default function App() {
           <Route path="/HowItWorks.asp" element={<Navigate to="/how-it-works" replace />} />
           <Route path="/Home.asp" element={<Navigate to="/simulator" replace />} />
           <Route path="/Projects.asp" element={<Navigate to="/assets" replace />} />
-          <Route path="/Showcase.asp" element={<Navigate to="/overview" replace />} />
-          <Route path="/About.asp" element={<Navigate to="/how-it-works" replace />} />
+          <Route path="/Showcase.asp" element={<Navigate to="/cockpit" replace />} />
+          <Route path="/About.asp" element={<Navigate to="/creator" replace />} />
           <Route path="/Contact.asp" element={<Navigate to="/overview" replace />} />
 
           {/* Catch-all redirects back to secure landing overview */}

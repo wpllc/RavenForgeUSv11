@@ -4,9 +4,9 @@ import { Globe, RefreshCw } from 'lucide-react';
 export default function SatelliteGrid() {
   const canvasRef = useRef(null);
   const [activeSatellites, setActiveSatellites] = useState([
-    { id: 'SAT-1A', name: 'AEGIS-VIGIL', type: 'RADAR_RECON', lat: 38.9, lng: -77.0, alt: '420 KM', inc: '55.3°', status: 'ONLINE' },
-    { id: 'SAT-2C', name: 'ZEPHYR-UAV-LINK', type: 'DATA_UPLINK', lat: 34.0, lng: -118.2, alt: '680 KM', inc: '34.2°', status: 'ONLINE' },
-    { id: 'SAT-3B', name: 'HELIOS-GUARD', type: 'DEFENSE_GRID', lat: 28.5, lng: -80.6, alt: '35,780 KM', inc: '0.1°', status: 'GEOSYNC' }
+    { id: 'SAT-1A', name: 'AEGIS-VIGIL', type: 'RADAR_RECON', lat: 12.0, lng: -40.0, alt: '420 KM', inc: '55.3°', status: 'ONLINE' },
+    { id: 'SAT-2C', name: 'ZEPHYR-UAV-LINK', type: 'DATA_UPLINK', lat: 22.0, lng: 60.0, alt: '680 KM', inc: '34.2°', status: 'ONLINE' },
+    { id: 'SAT-3B', name: 'HELIOS-GUARD', type: 'DEFENSE_GRID', lat: 5.0, lng: 110.0, alt: '35,780 KM', inc: '0.1°', status: 'GEOSYNC' }
   ]);
   const [selectedSat, setSelectedSat] = useState(activeSatellites[0]);
   const [gridSpin, setGridSpin] = useState(0);
@@ -213,7 +213,7 @@ export default function SatelliteGrid() {
             <span style={{ color: 'var(--color-text-dark)' }}>ORBIT ALTITUDE:</span> <span style={{ color: 'var(--color-amber)' }}>{selectedSat.alt}</span>
           </div>
           <div>
-            <span style={{ color: 'var(--color-text-dark)' }}>GROUND TRACK:</span> <span style={{ color: 'var(--color-cyan)' }}>{selectedSat.lat.toFixed(2)}N // {selectedSat.lng.toFixed(2)}W</span>
+            <span style={{ color: 'var(--color-text-dark)' }}>SCENARIO TRACK:</span> <span style={{ color: 'var(--color-cyan)' }}>SCENARIO GRID {selectedSat.lat.toFixed(1)} / {selectedSat.lng.toFixed(1)} (SYNTHETIC)</span>
           </div>
           <div>
             <span style={{ color: 'var(--color-text-dark)' }}>STATUS CORE:</span> <span style={{ color: 'var(--color-green)', fontWeight: 'bold' }}>{selectedSat.status}</span>

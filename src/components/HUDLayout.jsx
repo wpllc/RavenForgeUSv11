@@ -111,6 +111,7 @@ export default function HUDLayout({ children }) {
     { path: '/audit-trail', label: 'Audit History', icon: Terminal },
     { path: '/guided-demo', label: 'Product Tour', icon: Activity },
     { path: '/how-it-works', label: 'How It Works', icon: Shield },
+    { path: '/cockpit', label: 'Mission Cockpit (Fiction)', icon: Activity },
     { path: '/simulator', label: 'Policy Test Lab', icon: Settings }
   ];
 
@@ -140,7 +141,7 @@ export default function HUDLayout({ children }) {
           <div className="app-logo">
             <Shield size={20} className="text-[#38bdf8]" aria-hidden="true" />
             <span className="font-bold text-white tracking-tight uppercase">
-              RAVENFORGE <span className="text-[#94a3b8] font-light">SYSTEMS</span>
+              RavenForge
             </span>
           </div>
         </div>
@@ -301,8 +302,10 @@ export default function HUDLayout({ children }) {
 
       {/* 5. FOOTER */}
       <footer className="bg-[#090d16] border-t border-[#334155]/30 py-3 px-4 md:px-6 flex justify-between items-center text-xs text-[#64748b] shrink-0 font-sans">
-        <div>
-          <span>RAVENFORGE SYSTEMS LLC &copy; 2026</span>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+          <span>RavenForge · Project by Walker Pollitt &copy; 2026</span>
+          <a href="/creator">Creator &amp; credentials</a>
+          <a href="https://walkerpollittllc.com/">Walker Pollitt LLC</a>
         </div>
         <div className="hidden sm:flex gap-4">
           <span>Audit Log Recorded</span>
