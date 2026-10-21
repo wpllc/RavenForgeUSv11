@@ -77,6 +77,9 @@ export default function Simulator() {
     return getValidatedParam('evidenceCompleteness', ['Complete Photo Set', 'Incomplete/Indeterminate Metadata'], 'Incomplete/Indeterminate Metadata');
   });
 
+  // Active preset scenario (defaults to the first scenario on load)
+  const [activeScenarioKey, setActiveScenarioKey] = useState('ocr_mismatch');
+
   // Sync state when active scenario changes
   useEffect(() => {
     // Only apply preset scenario values if no query parameter overrides exist
