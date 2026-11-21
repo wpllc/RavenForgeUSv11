@@ -3,8 +3,13 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import HUDLayout from './components/HUDLayout';
 
 // Import public demonstration pages
+import Platform from './pages/Platform';
 import Overview from './pages/Overview';
 import GuidedDemo from './pages/GuidedDemo';
+import GuidedCutaway from './pages/GuidedCutaway';
+import DemoHub from './pages/DemoHub';
+import MilitaryDemo from './pages/MilitaryDemo';
+import CouncilDemo from './pages/CouncilDemo';
 import Evidence from './pages/Evidence';
 import Assets from './pages/Assets';
 import Findings from './pages/Findings';
@@ -22,13 +27,18 @@ export default function App() {
       <HUDLayout>
         <Routes>
           {/* Default base route redirect to /overview */}
-          <Route path="/" element={<Navigate to="/overview" replace />} />
+          <Route path="/" element={<Navigate to="/demos" replace />} />
           
           {/* Clean route nodes */}
+          <Route path="/platform" element={<Platform />} />
           <Route path="/creator" element={<About />} />
           <Route path="/cockpit" element={<Cockpit />} />
           <Route path="/overview" element={<Overview />} />
-          <Route path="/guided-demo" element={<GuidedDemo />} />
+          <Route path="/demos" element={<DemoHub />} />
+          <Route path="/demos/military" element={<MilitaryDemo />} />
+          <Route path="/demos/council" element={<CouncilDemo />} />
+          <Route path="/guided-demo" element={<GuidedCutaway />} />
+          <Route path="/audit-tour" element={<GuidedDemo />} />
           <Route path="/evidence" element={<Evidence />} />
           <Route path="/assets" element={<Assets />} />
           <Route path="/findings" element={<Findings />} />

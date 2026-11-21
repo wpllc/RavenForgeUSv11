@@ -13,7 +13,8 @@ import {
   Menu, 
   X, 
   Settings,
-  ChevronDown
+  ChevronDown,
+  Layers
 } from 'lucide-react';
 import { getPendingReviewCount } from '../data/selectors';
 
@@ -93,8 +94,14 @@ export default function HUDLayout({ children }) {
     });
   };
 
+  const isPlatform = location.pathname === '/platform' || location.pathname === '/';
+  const isFiction = location.pathname === '/cockpit';
+  const environmentLabel = isPlatform ? 'Development Preview' : isFiction ? 'Fictional Cockpit' : 'Demo Sandbox';
+
   const primaryItems = [
-    { path: '/overview', label: 'Overview', icon: Info },
+    { path: '/platform', label: 'Platform', icon: Shield },
+    { path: '/demos', label: 'Demos', icon: Layers },
+    { path: '/overview', label: 'Inspection Demo', icon: Info },
     { path: '/assets', label: 'Assets', icon: Cpu },
     { path: '/evidence', label: 'Evidence', icon: Database },
     { path: '/findings', label: 'Findings', icon: AlertTriangle },
@@ -109,7 +116,7 @@ export default function HUDLayout({ children }) {
 
   const secondaryItems = [
     { path: '/audit-trail', label: 'Audit History', icon: Terminal },
-    { path: '/guided-demo', label: 'Product Tour', icon: Activity },
+    { path: '/audit-tour', label: 'Inspection Tour', icon: Activity },
     { path: '/how-it-works', label: 'How It Works', icon: Shield },
     { path: '/cockpit', label: 'Mission Cockpit (Fiction)', icon: Activity },
     { path: '/simulator', label: 'Policy Test Lab', icon: Settings }
@@ -120,7 +127,7 @@ export default function HUDLayout({ children }) {
       
       {/* 1. GLOBAL DEMO ENVIRONMENT BANNER */}
       <div className="demo-environment-banner" role="status">
-        Demo Environment — Operating with simulated validation datasets
+        {isPlatform ? 'Development preview — capabilities and limits stated for each component' : isFiction ? 'Fictional mission cockpit — entertainment and navigation, not an operational system' : 'Demo environment — simulated validation datasets'}
       </div>
 
       {/* 2. MAIN HEADER (TOP BAR) */}
@@ -148,7 +155,7 @@ export default function HUDLayout({ children }) {
 
         <div className="flex items-center gap-3 text-xs">
           <span className="badge badge-gray normal-case font-sans">
-            Demo Sandbox
+            {environmentLabel}
           </span>
         </div>
       </header>
@@ -168,7 +175,7 @@ export default function HUDLayout({ children }) {
               >
                 <Icon size={14} aria-hidden="true" />
                 <span>{item.label}</span>
-                {item.badge !== null && (
+                {item.badge > 0 && (
                   <span className="badge badge-amber text-[9px] px-1 py-0" style={{ marginLeft: '4px' }}>
                     {item.badge}
                   </span>
@@ -252,7 +259,7 @@ export default function HUDLayout({ children }) {
                         >
                           <Icon size={16} aria-hidden="true" />
                           <span>{item.label}</span>
-                          {item.badge !== null && (
+                          {item.badge > 0 && (
                             <span className="badge badge-amber text-[10px] px-1.5 py-0.5" style={{ marginLeft: 'auto' }}>
                               {item.badge}
                             </span>
@@ -284,7 +291,7 @@ export default function HUDLayout({ children }) {
               </div>
 
               <div className="pt-6 border-t border-[#334155]/50 text-[10px] text-[#64748b] font-mono">
-                <div>ENVIRONMENT: SANDBOX</div>
+                <div>ENVIRONMENT: {environmentLabel.toUpperCase()}</div>
               </div>
             </aside>
           </>
@@ -308,8 +315,8 @@ export default function HUDLayout({ children }) {
           <a href="https://walkerpollittllc.com/">Walker Pollitt LLC</a>
         </div>
         <div className="hidden sm:flex gap-4">
-          <span>Audit Log Recorded</span>
-          <span>Rules Enforced</span>
+          <span>{isPlatform ? 'Development preview' : 'Simulated audit history'}</span>
+          <span>{isPlatform ? 'Scope and evidence matter' : 'Demonstration scenarios'}</span>
         </div>
       </footer>
     </div>

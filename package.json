@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "npm run build && wrangler dev",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "test:tour": "node --test tests/cutawayModel.test.mjs",
+    "test:demos": "node --test tests/cutawayModel.test.mjs tests/scenarioModels.test.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.379.0",

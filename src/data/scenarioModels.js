@@ -1,0 +1,38 @@
+// Deterministic browser demonstrations. No provider, equipment or network execution.
+export const MILITARY_DEFAULTS={commandBusy:true,linkAvailable:true,heartbeatFresh:true,trustValid:true,operation:'read-log',outcome:'captured'};
+export function militaryRun(input){
+ for(const k of ['commandBusy','linkAvailable','heartbeatFresh','trustValid'])if(typeof input[k]!=='boolean')throw new TypeError('Explicit state required');
+ if(!['read-log','send-external','change-policy'].includes(input.operation)||!['captured','timeout'].includes(input.outcome))throw new TypeError('Unknown simulation action');
+ const events=[{system:'INTAKE',status:'RECORDED',detail:'Synthetic request: summarize a maintenance log. Scope: read that log; no equipment control.'}];
+ const resource=!input.commandBusy?'Command node':input.linkAvailable&&input.heartbeatFresh?'Field workstation':null;
+ if(!resource){events.push({system:'WAYFINDER',status:'NO ELIGIBLE RESOURCE',detail:!input.linkAvailable?'Command node is busy and the field link is unavailable. No cloud fallback.':'Command node is busy and the field heartbeat is stale. No stale capacity is admitted.'});return {state:'BLOCKED',resource:null,events,receipt:null,releaseAllowed:false};}
+ if(resource==='Field workstation'&&!input.trustValid){events.push({system:'BALEFIRE',status:'ADMISSION DENIED',detail:'The supplied device trust check failed. The field device is not admitted and MUSTER makes no assignment. This test flag is not a malware scan.'});return {state:'DENIED',resource:null,events,receipt:null,releaseAllowed:false};}
+ events.push({system:'WAYFINDER',status:'SELECTED',detail:resource+' selected from current eligible resources. A recommendation is not execution authority.'},{system:'MUSTER',status:'RESERVED',detail:'One simulated owner and one assignment. No duplicate claim and no inference retry.'});
+ if(input.operation!=='read-log'){events.push({system:'BALEFIRE',status:'DENIED',detail:input.operation==='send-external'?'External transfer is outside this read-only task. No data leaves the scenario.':'Changing governing policy is outside this task. The task cannot enlarge its own authority.'});return {state:'DENIED',resource,events,receipt:null,releaseAllowed:false};}
+ events.push({system:'BALEFIRE',status:'WITHIN SCOPE',detail:'Read-only maintenance-log access. No external destination, policy mutation or equipment command.'});
+ if(input.outcome==='timeout'){events.push({system:'MUSTER',status:'UNKNOWN',detail:'Completion receipt was not captured. Preserve the assignment; do not retry, requeue or infer success.'});return {state:'UNKNOWN',resource,events,receipt:null,releaseAllowed:false};}
+ const receipt={id:'SIM-RECEIPT-017',request:'SIM-MAINT-017',resource,evidence:['SIM-LOG-017','SIM-SCOPE-017'],output:'Sample log indicates an overdue filter inspection. A maintenance lead should review the source before scheduling work.'};
+ events.push({system:'MUSTER',status:'CAPTURED',detail:'Example result retained with its request, selected resource and source references.'},{system:'VERIFIER',status:'REVIEW READY',detail:'Fixture checks find the required source references and permitted scope. Human review still required.'});
+ return {state:'REVIEW_READY',resource,events,receipt,releaseAllowed:true};
+}
+export const COUNCIL_CASES=[
+ {id:'complete',title:'Complete evidence',subtitle:'All voices support review',votes:['ADVANCE','ADVANCE','ADVANCE','ADVANCE'],fault:null,expected:'REVIEW_READY',reason:'The supplied fixture evidence is current, complete and within authority. A person can review the proposed plan.'},
+ {id:'dissent',title:'One unresolved objection',subtitle:'Three agree; one challenges',votes:['ADVANCE','ADVANCE','ADVANCE','HOLD'],fault:'Unresolved critical assumption',expected:'HOLD',reason:'The challenger identifies an untested dependency. A majority cannot erase a material unresolved objection.'},
+ {id:'missing',title:'A missing source',subtitle:'Unanimity still cannot verify it',votes:['ADVANCE','ADVANCE','ADVANCE','ADVANCE'],fault:'Source TEST-02 absent',expected:'HOLD',reason:'All four scripted voices agree, but the referenced test is absent. Agreement cannot manufacture evidence.'},
+ {id:'stale',title:'Evidence expired',subtitle:'Yesterday’s answer is insufficient',votes:['ADVANCE','ADVANCE','HOLD','HOLD'],fault:'Evidence validity elapsed',expected:'STALE',reason:'The example evidence is outside its validity window. A new observation is required before release.'},
+ {id:'authority',title:'Authority expired',subtitle:'A good answer is not permission',votes:['ADVANCE','ADVANCE','ADVANCE','ADVANCE'],fault:'Task authority elapsed',expected:'BLOCKED',reason:'A correct-looking result cannot renew expired authority. The record stays blocked.'},
+];
+export const COUNCIL_ROLES=[{name:'Operations',job:'Does the plan serve the user’s objective?'},{name:'Engineering',job:'Do the sources support the technical claims?'},{name:'Resources',job:'Are the time and compute assumptions stated?'},{name:'Challenger',job:'What could invalidate the proposed answer?'}];
+export function checkCouncilEvidence({sources,evidenceCurrent,authorityCurrent,criticalObjection}) {
+ if(!Array.isArray(sources)||sources.length===0||new Set(sources.map(s=>s.id)).size!==sources.length||sources.some(s=>typeof s.id!=='string'||!s.id||!['PRESENT','MISSING','EXPIRED'].includes(s.status))||![evidenceCurrent,authorityCurrent,criticalObjection].every(v=>typeof v==='boolean'))throw new TypeError('Explicit source and authority checks required');
+ if(!authorityCurrent)return 'BLOCKED';
+ if(!evidenceCurrent)return 'STALE';
+ if(criticalObjection||sources.some(s=>s.status!=='PRESENT'))return 'HOLD';
+ return 'REVIEW_READY';
+}
+export function councilRun(caseId,{healthCurrent=true}={}){if(typeof healthCurrent!=='boolean')throw new TypeError('Explicit health observation required');const c=COUNCIL_CASES.find(c=>c.id===caseId);if(!c)throw new TypeError('Unknown fixture');const sources=[{id:'PLAN-01',status:'PRESENT'},{id:'TEST-02',status:c.id==='missing'?'MISSING':'PRESENT'},{id:'SCOPE-03',status:c.id==='authority'?'EXPIRED':'PRESENT'}],evidenceCurrent=c.id!=='stale',authorityCurrent=c.id!=='authority',criticalObjection=c.id==='dissent';const state=healthCurrent?checkCouncilEvidence({sources,evidenceCurrent,authorityCurrent,criticalObjection}):'BLOCKED';return {caseId:c.id,state,votes:[...c.votes],fault:c.fault,healthCurrent,reason:healthCurrent?c.reason:'The example service heartbeat is stale. HEIMDALL reports uncertainty; a current observation is required before demo release.',majorityWouldAdvance:c.votes.filter(v=>v==='ADVANCE').length>2,releaseAllowed:state==='REVIEW_READY',sources,evidenceCurrent,authorityCurrent,criticalObjection};}
+export const FUNDING_SOURCES=[
+ {name:'NSF Project Pitch',url:'https://seedfund.nsf.gov/apply/project-pitch-information/',status:'Potential research-fit route',note:'Substantial technical R&D, defensible novelty, customer need and company eligibility must be demonstrated. Routine integration is insufficient.'},
+ {name:'AFWERX funding routes',url:'https://afwerx.com/get-funded/',status:'Defense topic/customer fit required',note:'Use a matching solicitation and mission need. This demonstration is not a claim of topic eligibility or a defense award.'},
+ {name:'DOE Genesis Mission Consortium',url:'https://genesismissionconsortium.org/',status:'Existing collaboration-interest path',note:'Walker confirmed the November 15 interest submission and Exchange profile. Membership approval and funding are unverified. Seek domain expertise and bounded evaluation partners; contributions require separate agreement.'},
+];

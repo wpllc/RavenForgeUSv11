@@ -1,0 +1,9 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {evaluate,gate,chapterFromSearch,DEFAULTS,SOURCES} from '../src/data/cutawayModel.js';
+test('default recommendation exposes all cost components',()=>{const {options,recommendation}=evaluate(DEFAULTS);assert.equal(recommendation.id,'replace');assert.deepEqual(options.map(o=>o.total),[470000,258000,230000]);for(const o of options)assert.equal(o.total,o.capital+o.maintenance+o.exposure);});
+test('capital budget limits admission rather than lifecycle cost',()=>{assert.equal(evaluate({budget:100000,hourlyLoss:40000}).recommendation.id,'overhaul');assert.equal(evaluate({budget:0,hourlyLoss:40000}).recommendation.id,'maintain');assert.equal(evaluate({budget:180000,hourlyLoss:40000}).recommendation.id,'replace');});
+test('different outage assumptions change recommendation',()=>{assert.equal(evaluate({budget:250000,hourlyLoss:0}).recommendation.id,'overhaul');assert.equal(evaluate({budget:250000,hourlyLoss:100000}).recommendation.id,'replace');});
+test('invalid numerical assumptions never imply a recommendation',()=>{for(const n of [NaN,Infinity,-1,'40000',null])assert.throws(()=>evaluate({budget:250000,hourlyLoss:n}));assert.throws(()=>evaluate({budget:300001,hourlyLoss:0}));});
+test('unreviewed, stale and unaffordable decisions remain closed',()=>{const {options}=evaluate({budget:100000,hourlyLoss:40000});const ids=SOURCES.map(e=>e.id);assert.ok(gate([],false,'overhaul',options));assert.ok(gate(ids,true,'overhaul',options));assert.ok(gate(ids,false,'replace',options));assert.ok(gate(ids,false,'unknown',options));assert.equal(gate(ids,false,'overhaul',options),null);});
+test('deep links are bounded; legacy step links work',()=>{assert.equal(chapterFromSearch('?chapter=6'),5);assert.equal(chapterFromSearch('?step=4'),3);for(const s of ['?chapter=0','?chapter=999','?chapter=2x','?chapter=-1','?chapter=1.5'])assert.equal(chapterFromSearch(s),0);});
