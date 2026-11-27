@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>If Your AI Cannot Explain What It Did, You Cannot Properly Govern It | RavenForge</title>
+  <meta name="description" content="Learn how structured evidence, independent authorization and application telemetry make AI automation more accountable.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="If Your AI Cannot Explain What It Did, You Cannot Properly Govern It">
+  <meta property="og:description" content="Learn how structured evidence, independent authorization and application telemetry make AI automation more accountable.">
+  <meta property="og:url" content="https://ravenforge.us/blog/ai-accountability-engineering-evidence/">
+  <meta property="og:image" content="https://ravenforge.us/blog/ai-accountability-evidence.jpg">
+  <meta property="og:image:alt" content="Illustration of an engineer measuring a machined part beside a digital timeline and inspection sheet.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="article:published_time" content="2026-11-27">
+  <link rel="canonical" href="https://ravenforge.us/blog/ai-accountability-engineering-evidence/">
+  <link rel="stylesheet" href="/blog/editorial.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to main content</a>
+  <header class="site"><div class="wrap nav">
+    <a class="brand" href="/">RavenForge</a>
+    <nav aria-label="Main navigation"><a href="/demos">Demos</a><a href="/platform">Platform</a><a href="/blog/">Blog</a></nav>
+  </div></header>
+  <main id="main" class="wrap">
+    <article>
+      <div class="heading">
+        <p class="eyebrow"><a href="/blog/">RavenForge Blog</a></p>
+        <h1>If Your AI Cannot Explain What It Did, You Cannot Properly Govern It</h1>
+        <p class="lead">An engineering approach to accountability in autonomous systems.</p>
+        <p class="byline">Walker Pollitt LLC <span aria-hidden="true">·</span> <time datetime="2026-11-27">November 27, 2026</time></p>
+      </div>
+      <figure class="hero-art"><img src="/blog/ai-accountability-evidence.jpg" width="1536" height="1024" fetchpriority="high" alt="Illustration of an engineer measuring a machined part beside a digital timeline and inspection sheet."></figure>
+      <div class="article-body">
+<p>Artificial intelligence has made it remarkably easy to produce answers. Establishing whether those answers are trustworthy remains an entirely different engineering problem.</p>
+<p>Consider an AI system that reviews maintenance documentation and recommends replacing a piece of equipment.</p>
+<p>Its recommendation may be correct. But what evidence did it use? Was that evidence current? Which requirements influenced its decision? Did it have permission to initiate a purchase or merely recommend one?</p>
+<p>Those questions become increasingly important as AI moves from answering questions to performing work.</p>
+<h2>A confident answer is not evidence</h2>
+<p>A language model can generate an extremely convincing explanation without that explanation accurately representing how its output was produced.</p>
+<p>Therefore, asking an AI to explain itself after completing a task is not a substitute for recording what actually occurred.</p>
+<p>We need independently observable evidence.</p>
+<p>In traditional engineering, we preserve commissioning records, test results, equipment identification, revision histories and acceptance criteria.</p>
+<p>Intelligent automation deserves comparable discipline.</p>
+<h2>The minimum viable evidence trail</h2>
+<p>Small businesses do not necessarily need an expensive governance platform to begin implementing accountable automation.</p>
+<p>Start by recording seven categories of information.</p>
+<table><thead><tr><th scope="col">Evidence</th><th scope="col">Purpose</th></tr></thead><tbody>
+<tr><td>Task identifier</td><td>Connect related operations</td></tr>
+<tr><td>UTC timestamps</td><td>Establish when events occurred</td></tr>
+<tr><td>Model and configuration versions</td><td>Identify the operating environment</td></tr>
+<tr><td>Input references</td><td>Identify the evidence considered</td></tr>
+<tr><td>Tool operations and results</td><td>Establish observable actions</td></tr>
+<tr><td>Authorization decisions</td><td>Determine what was permitted</td></tr>
+<tr><td>Completion and validation status</td><td>Establish whether the task succeeded</td></tr>
+</tbody></table>
+<p>These records should come from the application, execution environment and authorization mechanisms wherever possible, rather than relying exclusively on the AI&#39;s description of its own behavior.</p>
+<h2>Separate recommendations from authority</h2>
+<p>Suppose an automated inspection system identifies an abnormal temperature reading.</p>
+<p>It might recommend shutting down a piece of equipment.</p>
+<p>That does not mean it should automatically possess the authority to do so.</p>
+<p>The distinction between recommending an action and authorizing that action is fundamental to engineering safe systems.</p>
+<p>An independent authorization mechanism should evaluate the applicable permissions, operating conditions and required approvals before allowing consequential actions.</p>
+<h2>Instrumentation is a practical starting point</h2>
+<p>OpenTelemetry provides a standardized approach to collecting application telemetry, including traces, metrics and logs.</p>
+<p>Using technologies such as Azure Monitor Application Insights, developers can associate related operations through trace identifiers and introduce additional application-specific telemetry.</p>
+<p>However, an ordinary application trace is not automatically a complete or tamper-resistant audit record. Sampling, retention limits, access permissions and incomplete instrumentation can all affect the available evidence.</p>
+<p>Security-critical authorization records may require separate, appropriately protected storage.</p>
+<h2>Protect the information you collect</h2>
+<p>Recording everything is not responsible governance.</p>
+<p>Credentials, proprietary customer information, sensitive infrastructure details and personally identifiable information should not be indiscriminately captured in diagnostic logs.</p>
+<p>Government and defense contractors must also consider the specific information-handling requirements of their agreements before transferring telemetry to external services.</p>
+<p>Collect what is necessary. Protect what is collected. Retain it only for an appropriate period.</p>
+<h2>Engineering the ability to learn from failure</h2>
+<p>The real value of a properly constructed evidence trail becomes apparent when something goes wrong.</p>
+<p>Without reliable records, engineers are forced to reconstruct events through assumptions.</p>
+<p>With reliable records, they can investigate failures, identify dependencies, reproduce conditions and improve the system.</p>
+<p><strong>Accountability is not something we should ask an intelligent system to provide after the fact. It is something we should engineer into the system from the beginning.</strong></p>
+<h2>Continue learning</h2>
+<p>Microsoft&#39;s documentation explains how to introduce custom OpenTelemetry instrumentation and retrieve trace and span identifiers.</p>
+<p><a href="https://learn.microsoft.com/en-us/azure/azure-monitor/app/opentelemetry-add-modify?wt.mc_id=studentamb_521824">Microsoft Learn — Add and modify OpenTelemetry instrumentation</a></p>
+<p><em>RavenForge — An educational publication by Walker Pollitt LLC.</em></p>
+      </div>
+    </article>
+  </main>
+  <footer class="wrap">
+    <a href="/">RavenForge</a>
+    <a href="https://walkerpollittllc.com/travel/">Travel Blog</a>
+  </footer>
+</body>
+</html>
