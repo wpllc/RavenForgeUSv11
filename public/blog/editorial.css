@@ -1,0 +1,48 @@
+:root {
+  color-scheme: light;
+  --page: #f8fafc;
+  --ink: #101e32;
+  --muted: #3b5069;
+  --accent: #16578c;
+  --edge: #cbd8e5;
+  --surface: #fff;
+  font-family: system-ui, sans-serif;
+}
+
+:root.dark {
+  color-scheme: dark;
+  --page: #090f19;
+  --ink: #eaf4fc;
+  --muted: #b3c7da;
+  --accent: #7addc7;
+  --edge: #304558;
+  --surface: #121d2b;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); }
+a { color: var(--accent); text-underline-offset: .2em; overflow-wrap: anywhere; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.wrap { width: min(100% - 2.5rem, 52rem); margin-inline: auto; }
+.site { background: var(--surface); border-bottom: 1px solid var(--edge); }
+.nav, nav, footer { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem 1.35rem; }
+.nav { justify-content: space-between; padding-block: 1.15rem; }
+.brand { font-weight: 750; color: var(--ink); text-decoration: none; }
+.skip { position: absolute; left: -100rem; }
+.skip:focus { left: 1rem; top: .5rem; background: var(--surface); padding: .65rem; z-index: 1; }
+.heading { padding-block: clamp(2.5rem, 7vw, 5.5rem) 1.8rem; border-bottom: 1px solid var(--edge); }
+.eyebrow, .byline { color: var(--muted); font-size: .92rem; }
+h1 { max-width: 15ch; margin: 0 0 .85rem; font-size: clamp(2.45rem, 7vw, 4.4rem); line-height: 1.03; letter-spacing: -.055em; }
+.lead { margin: 0 0 .5rem; color: var(--muted); font-size: clamp(1.15rem, 3vw, 1.45rem); }
+.dek { margin: .35rem 0; color: var(--muted); }
+.byline { margin-top: 1.25rem; }
+.article-body { max-width: 68ch; padding-block: 1rem 2rem; font-size: 1.07rem; line-height: 1.65; }
+.article-body h2 { margin: 2.2rem 0 .5rem; font-size: 1.5rem; line-height: 1.2; }
+ul { padding-inline-start: 1.4rem; }
+table { border-collapse: collapse; width: 100%; margin-block: 1.35rem; font-size: .96rem; }
+th, td { border-bottom: 1px solid var(--edge); padding: .6rem; text-align: left; vertical-align: top; }
+th { background: var(--surface); }
+.card { background: var(--surface); margin-block: 1.5rem 3rem; border: 1px solid var(--edge); padding: clamp(1rem, 3vw, 1.7rem); }
+.card h2 { margin-block: .6rem; }
+.card p { margin-bottom: 0; color: var(--muted); }
+footer { border-top: 1px solid var(--edge); padding-block: 1.3rem 2.4rem; color: var(--muted); font-size: .92rem; }

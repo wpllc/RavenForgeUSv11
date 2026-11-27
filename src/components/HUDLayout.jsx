@@ -312,6 +312,7 @@ export default function HUDLayout({ children }) {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
           <span>RavenForge · Project by Walker Pollitt &copy; 2026</span>
           <a href="/creator">Creator &amp; credentials</a>
+          <a href="/blog/">Blog</a>
           <a href="https://walkerpollittllc.com/">Walker Pollitt LLC</a>
         </div>
         <div className="hidden sm:flex gap-4">
